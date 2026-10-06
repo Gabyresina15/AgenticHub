@@ -25,10 +25,13 @@ export default function InteractiveChallenge({ challenge, onSolve }) {
       const payload = await res.json();
       const passed = payload.data?.passed;
       const first = payload.data?.results?.[0];
+      const detail = first
+        ? `Salio: ${JSON.stringify(first.stdout)} | Esperado: ${JSON.stringify(first.expected)}`
+        : "";
       setStatus(passed ? 'success' : 'error');
       setFeedback(passed
         ? challenge.successMessage
-        : first?.stderr || payload.data?.message || challenge.errorMessage || 'La salida no coincide con el test.');
+        : detail || first?.stderr || payload.data?.message || challenge.errorMessage || 'La salida no coincide con el test.');
       if (passed && onSolve) onSolve();
     } catch (error) {
       setStatus('error');
