@@ -25,7 +25,12 @@ const lessonSchema = new mongoose.Schema({
     language: { type: String, default: "javascript" },
     initialCode: String,
     solutionKey: String,
-    tests: [{ stdin: String, expected: String }],
+    tests: [{
+      fn: String,
+      args: { type: Array, default: undefined },
+      stdin: String,
+      expected: { type: mongoose.Schema.Types.Mixed }
+    }],
     successMessage: String,
     errorMessage: String
   },
