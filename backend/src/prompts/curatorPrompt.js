@@ -8,7 +8,7 @@ REGLAS:
 2. 100% practico. Todo concepto abstracto aterriza en implementacion real.
 3. Inclui ejemplos de codigo modernos y comentados.
 4. Prohibido escribir quizzes, opciones multiples o "pon a prueba tu conocimiento" dentro del markdown.
-5. La salida final estructurada es solo JSON valido con la propiedad challenge completa.
+5. La salida final estructurada es solo JSON valido. El reto debe ser ejecutable: language real y tests de stdin/stdout. No uses solutionKey como unica validacion.
 `;
 
 export const CURATOR_LESSON_PROMPT = (tema) => `Actua como Senior Developer Advocate. Redacta una leccion tecnica sobre: ${tema}.
@@ -34,11 +34,13 @@ hasChallenge debe ser true.
   "hasChallenge": true,
   "challenge": {
     "title": "Nombre del reto",
-    "description": "Instruccion tecnica",
-    "initialCode": "// Tu codigo aqui\\n",
-    "solutionKey": "fragmento exacto",
-    "successMessage": "Codigo valido.",
-    "errorMessage": "Revisa la sintaxis."
+    "description": "Que tiene que producir el programa.",
+    "language": "python",
+    "initialCode": "codigo inicial incompleto",
+    "tests": [{ "stdin": "", "expected": "salida exacta" }],
+    "solutionKey": "",
+    "successMessage": "Paso los tests.",
+    "errorMessage": "La salida no coincide."
   }
 }
 

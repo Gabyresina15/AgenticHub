@@ -2,6 +2,7 @@ import express from "express";
 import { routeAgent } from "../ai/router/agentRouter.js";
 import { getAgentRunner } from "../ai/agents/registry.js";
 import { appendMessage, ensureSystemMessage, getContextWindow } from "../services/sessionContext.js";
+import { executeCode } from "../services/codeRunner.js";
 import { sendContract } from "../utils/apiResponse.js";
 
 const router = express.Router();
@@ -46,6 +47,27 @@ router.post("/orchestrate", async (req, res) => {
       httpStatus: 500,
       status: "error",
       data: { message: error.message || "Error al orquestar la solicitud" },
+      agentUsed: null,
+      startedAt,
+    });
+  }
+});
+
+router.post("/execute", async (req, res) => {
+  const startedAt = Date.now();
+  try {
+    const result = await executeCode(req.body || {});
+    return sendContract(res, {
+      status: result.passed ? "ok" : "error",
+      data: result,
+      agentUsed: null,
+      startedAt,
+    });
+  } catch (error) {
+    return sendContract(res, {
+      httpStatus: 400,
+      status: "error",
+      data: { message: error.message },
       agentUsed: null,
       startedAt,
     });

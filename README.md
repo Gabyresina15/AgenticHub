@@ -70,6 +70,19 @@ Si `OLLAMA_ROUTER_URL` esta definido, el switch usa ese modelo local. Gemini que
 
 Las rutas de academia (`/api/courses`, `/api/auth`, `/api/lessons`) mantienen su contrato anterior para no romper el frontend React. El contrato estricto aplica a `/api/v1/orchestrate` y `/api/agent/research`.
 
-## Video pitch
+## Ejecutar codigo de verdad
+
+El reto ya no aprueba por contener un string. `POST /api/v1/execute` compila y corre tests.
+
+```bash
+docker run -d --name agentichub-piston --privileged -p 2000:2000 ghcr.io/engineer-man/piston
+docker exec agentichub-piston piston ppman install python node go rust java
+docker run -d --name agentichub-pg -e POSTGRES_PASSWORD=academy -e POSTGRES_DB=academy -p 5432:5432 pgvector/pgvector:pg16
+```
+
+En `.env`: `PISTON_URL=http://127.0.0.1:2000` y `PGVECTOR_URL=postgres://postgres:academy@127.0.0.1:5432/academy`.
+
+`python`, `javascript`, `go`, `rust`, `java`, `c` y `cpp` pasan por Piston. `pgvector` corre en el Postgres sandbox, dentro de una transaccion que siempre hace rollback. La API publica de Piston ya no es libre: el runner tiene que ser propio.
+
 
 Reemplazar esta URL cuando el pitch este publicado: `https://www.youtube.com/watch?v=VIDEO_PITCH`

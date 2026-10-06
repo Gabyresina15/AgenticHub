@@ -22,8 +22,10 @@ const lessonSchema = new mongoose.Schema({
   challenge: {
     title: String,
     description: String,
+    language: { type: String, default: "javascript" },
     initialCode: String,
     solutionKey: String,
+    tests: [{ stdin: String, expected: String }],
     successMessage: String,
     errorMessage: String
   },
