@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import InteractiveChallenge from './InteractiveChallenge';
 import { useParams } from 'react-router-dom';
 
 export default function Feed() {
@@ -66,6 +67,10 @@ export default function Feed() {
             <div className="prose prose-indigo max-w-none text-slate-700 mb-8">
               <ReactMarkdown>{cleanMarkdown(lesson.contentMarkdown)}</ReactMarkdown>
             </div>
+
+            {lesson.challenge?.initialCode && (
+              <InteractiveChallenge challenge={lesson.challenge} />
+            )}
 
             {/* Sección del Quiz generado por la IA */}
             {lesson.quizData && lesson.quizData.question && (
