@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,7 +11,46 @@ export default function Login() {
   const navigate = useNavigate();
   const { setUser } = useAuth();
 
-  const handleSubmit = async (e) => {
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+  useEffect(() => {
+    if (!googleClientId || window.google) return;
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    document.body.appendChild(script);
+  }, [googleClientId]);
+
+  const handleGoogle = async () => {
+    setError('');
+    if (!window.google || !googleClientId) {
+      setError('Falta configurar Google en el frontend.');
+      return;
+    }
+    window.google.accounts.id.initialize({
+      client_id: googleClientId,
+      callback: async (response) => {
+        setLoading(true);
+        try {
+          const res = await fetch('/api/auth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ credential: response.credential }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Google rechazó el ingreso');
+          setUser(data.user);
+          navigate(data.user.role === 'admin' ? '/admin' : '/courses');
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
+    window.google.accounts.id.prompt();
+  };
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -122,6 +161,16 @@ export default function Login() {
             {loading ? 'Procesando...' : isLogin ? 'Iniciar Sesión' : 'Registrarse'}
           </button>
         </form>
+
+        {googleClientId && (
+          <button
+            type="button"
+            onClick={handleGoogle}
+            className="w-full mt-4 bg-white text-slate-900 py-3 rounded-xl font-bold"
+          >
+            Continuar con Google
+          </button>
+        )}
 
         <div className="mt-6 text-center">
           <button
