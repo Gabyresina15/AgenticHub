@@ -1,57 +1,46 @@
-import Lesson from '../models/Lesson.js';
-import { correrAgenteCurador } from '../ai/agents/curatorAgent.js';
+import Lesson from "../models/Lesson.js";
+import { runCuratorAgent } from "../ai/agents/curatorAgent.js";
+import { sendContract } from "../utils/apiResponse.js";
 
 export const investigarTema = async (req, res) => {
-  try {
-    const { topic } = req.body;
-    
-    if (!topic) {
-      return res.status(400).json({ error: 'Falta el campo "topic" en el cuerpo de la petición' });
-    }
-
-    console.log(`\n🚀 [API] Petición recibida para investigar: ${topic}`);
-
-    // 1. Ejecutamos el agente curador para que trabaje con la IA
-    const rawResult = await correrAgenteCurador(topic);
-
-    // 2. Limpieza y Parseo seguro del JSON que devuelve el agente
-    let parsedAI;
-    if (typeof rawResult === 'string') {
-      const cleanJsonString = rawResult.replace(/^```json\n?/i, '').replace(/\n?```$/i, '').trim();
-      parsedAI = JSON.parse(cleanJsonString);
-      console.log("🕵️‍♂️ DATOS DEL RETO ENVIADOS POR GEMINI:", parsedAI.challenge);
-    } else {
-      parsedAI = rawResult;
-    }
-
-    /// 3. Guardado en la Base de Datos con el esquema interactivo de la academia
-    console.log("🕵️‍♂️ DATOS DEL RETO ENVIADOS POR GEMINI:", parsedAI.challenge);
-
-    // Creamos la nueva lección
-    const newLesson = new Lesson({
-      title: parsedAI.title || `Lección sobre ${topic}`,
-      contentMarkdown: (parsedAI.contentMarkdown || contenidoTexto).split('🧠')[0].trim(),
-      lessonType: 'reto_codigo', // Forzamos siempre que sea un reto
-      quizData: parsedAI.quizData || null,
-      // Si la IA no manda challenge, le inyectamos uno nosotros para probar
-      challenge: parsedAI.challenge || {
-        title: "Reto de Respaldo: Fetch Básico",
-        description: "Escribe una función que haga un GET a una API falsa.",
-        initialCode: "function getData() {\n  // Tu código aquí\n}",
-        solutionKey: "fetch(",
-        successMessage: "¡Excelente! Has usado fetch correctamente.",
-        errorMessage: "Recuerda usar la función fetch()."
-      },
-      status: 'draft'
+  const startedAt = Date.now();
+  const { topic } = req.body || {};
+  if (!topic) {
+    return sendContract(res, {
+      httpStatus: 400,
+      status: "error",
+      data: { message: "Falta el campo topic" },
+      agentUsed: "curator",
+      startedAt,
     });
+  }
 
-    await newLesson.save();
-    
-    console.log('✅ Lección interactiva creada y guardada como borrador.');
-    res.status(201).json({ success: true, data: newLesson });
-
+  try {
+    const result = await runCuratorAgent({ message: topic, context: [] });
+    const lesson = new Lesson({
+      title: result.lesson.title,
+      contentMarkdown: result.lesson.contentMarkdown,
+      lessonType: "reto_codigo",
+      quizData: result.lesson.quizData,
+      challenge: result.lesson.challenge,
+      status: "draft",
+    });
+    await lesson.save();
+    return sendContract(res, {
+      httpStatus: 201,
+      status: "ok",
+      data: lesson,
+      agentUsed: "curator",
+      startedAt,
+    });
   } catch (error) {
-    console.error('❌ Error al generar lección estructurada:', error);
-    res.status(500).json({ error: 'Error en el servidor o IA saturada' });
+    console.error("Error al generar leccion:", error);
+    return sendContract(res, {
+      httpStatus: 500,
+      status: "error",
+      data: { message: "Error en el servidor o IA saturada" },
+      agentUsed: "curator",
+      startedAt,
+    });
   }
 };
