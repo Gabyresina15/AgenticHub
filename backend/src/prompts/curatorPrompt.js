@@ -11,21 +11,19 @@ REGLAS:
 5. La salida final estructurada es solo JSON valido. El reto debe ser ejecutable: language real y tests de stdin/stdout. No uses solutionKey como unica validacion.
 `;
 
-export const CURATOR_LESSON_PROMPT = (tema) => `Actua como Senior Developer Advocate. Redacta una leccion tecnica sobre: ${tema}.
+export const CURATOR_LESSON_PROMPT = (tema) => `Actua como Senior Developer Advocate. Redacta una leccion corta sobre: ${tema}.
 
 ESTRUCTURA MARKDOWN:
 1. Titulo Principal (H1)
-2. Concepto Core (H2)
-3. Casos de Uso Reales (H2)
-4. Implementacion y Codigo (H2)
-5. Anti-Patrones / Pitfalls (H2)
+2. Concepto Core (H2), maximo 8 lineas
+3. El hueco (H2): mostra solo la firma y un pass. Prohibido escribir la solucion, el cuerpo de la funcion o un ejemplo resuelto.
 
-Restricciones: sin quizzes en el markdown. Empieza directo con el titulo. Usa bloques de codigo con lenguaje.`;
+Sin quizzes en el markdown.`;
 
 export const CURATOR_JSON_PROMPT = (contenidoTexto) => `Transforma el texto base en un objeto JSON puro.
 Devuelve solo JSON. Sin markdown. Empieza con { y termina con }.
-contentMarkdown no puede incluir preguntas.
-hasChallenge debe ser true.
+contentMarkdown no puede incluir la solucion ni el cuerpo implementado. Solo firma y pass.
+hasChallenge debe ser true. tests tiene que tener 2 o 3 casos, no mas.
 
 {
   "title": "Titulo corto",
