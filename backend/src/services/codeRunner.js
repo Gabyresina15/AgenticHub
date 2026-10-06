@@ -1,3 +1,8 @@
+import { spawn } from "node:child_process";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+
 const FILE_NAMES = {
   python: "main.py",
   javascript: "main.js",
@@ -43,7 +48,36 @@ export async function executeCode({ language, version = "*", code, tests = [], s
 
 async function runOnce({ language, version, code, stdin }) {
   if (language === "pgvector" || language === "postgres") return runPostgres({ code, stdin });
-  return runPiston({ language, version, code, stdin });
+  if (process.env.PISTON_URL) return runPiston({ language, version, code, stdin });
+  if (language === "python" || language === "javascript") return runLocal({ language, code, stdin });
+  throw new Error("Sin PISTON_URL solo corren python y javascript. Docker hace falta para el resto.");
+}
+
+function runLocal({ language, code, stdin }) {
+  const command = language === "python" ? (process.platform === "win32" ? "py" : "python3") : "node";
+  const fileName = FILE_NAMES[language];
+  return new Promise(async (resolve) => {
+    const dir = await mkdtemp(path.join(tmpdir(), "agentichub-"));
+    const file = path.join(dir, fileName);
+    await writeFile(file, code, "utf8");
+    const child = spawn(command, [file], { cwd: dir, windowsHide: true });
+    let stdout = "";
+    let stderr = "";
+    const timer = setTimeout(() => child.kill(), 3000);
+    child.stdout.on("data", (chunk) => { stdout += chunk; });
+    child.stderr.on("data", (chunk) => { stderr += chunk; });
+    child.on("error", async (error) => {
+      clearTimeout(timer);
+      await rm(dir, { recursive: true, force: true });
+      resolve({ stdout: "", stderr: error.message, code: 1 });
+    });
+    child.on("close", async (code) => {
+      clearTimeout(timer);
+      await rm(dir, { recursive: true, force: true });
+      resolve({ stdout, stderr, code: code ?? 1 });
+    });
+    child.stdin.end(stdin);
+  });
 }
 
 async function runPiston({ language, version, code, stdin }) {
