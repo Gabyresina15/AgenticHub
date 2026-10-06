@@ -77,6 +77,8 @@ export const googleLogin = async (req, res) => {
     res.status(401).json({ error: 'No se pudo validar el login de Google.' });
   }
 };
+
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body || {};
     const user = await User.findOne({ email: String(email || '').toLowerCase() });
