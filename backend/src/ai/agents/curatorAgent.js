@@ -45,7 +45,7 @@ const webSearchTool = {
 
 async function generate(ai, contents, withTools = false) {
   return ai.models.generateContent({
-    model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+    model: process.env.GEMINI_MODEL || "gemini-2.5-flash-lite",
     contents,
     config: {
       systemInstruction: CURATOR_SYSTEM_PROMPT,
@@ -69,7 +69,7 @@ export async function runCuratorAgent({ message, context = [] }) {
     { role: "user", parts: [{ text: CURATOR_LESSON_PROMPT(message) }] },
   ];
 
-  let response = await generate(ai, contents, true);
+  let response = await generate(ai, contents, process.env.CURATOR_WEB_SEARCH === "true");
   const calls = response.functionCalls || [];
   if (calls.length > 0) {
     const call = calls[0];
@@ -84,7 +84,7 @@ export async function runCuratorAgent({ message, context = [] }) {
 
   const contenidoTexto = response.text || "";
   const structured = await ai.models.generateContent({
-    model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+    model: process.env.GEMINI_MODEL || "gemini-2.5-flash-lite",
     contents: CURATOR_JSON_PROMPT(contenidoTexto),
     config: { responseMimeType: "application/json", systemInstruction: CURATOR_SYSTEM_PROMPT },
   });
