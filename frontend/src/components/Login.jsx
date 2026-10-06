@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
@@ -10,70 +11,27 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { setUser } = useAuth();
-
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-  useEffect(() => {
-    if (!googleClientId || window.google) return;
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    document.body.appendChild(script);
-  }, [googleClientId]);
-
-  const handleGoogle = async () => {
-    setError('');
-    if (!window.google || !googleClientId) {
-      setError('Falta configurar Google en el frontend.');
-      return;
-    }
-    window.google.accounts.id.initialize({
-      client_id: googleClientId,
-      callback: async (response) => {
-        setLoading(true);
-        try {
-          const res = await fetch('/api/auth/google', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ credential: response.credential }),
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'Google rechazó el ingreso');
-          setUser(data.user);
-          navigate(data.user.role === 'admin' ? '/admin' : '/courses');
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
-        }
-      },
-    });
-    window.google.accounts.id.prompt();
-  };
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
     setLoading(true);
 
     const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
-    
-    // Si se registran desde acá, por defecto son estudiantes. 
-    // Tu usuario admin ya lo creamos por Postman.
-    const body = isLogin 
+    const body = isLogin
       ? { email: formData.email, password: formData.password }
-      : { ...formData, role: 'student' }; 
+      : { ...formData, role: 'student' };
 
     try {
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       });
-
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error || 'Ocurrió un error en la autenticación');
 
       if (isLogin) {
@@ -81,8 +39,29 @@ export default function Login() {
         navigate(data.user.role === 'admin' ? '/admin' : '/courses');
       } else {
         setIsLogin(true);
-        setSuccess('¡Registro exitoso! Ya podés iniciar sesión.');
+        setSuccess('Registro exitoso. Ya podés iniciar sesión.');
       }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogle = async (credentialResponse) => {
+    setError('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ credential: credentialResponse.credential }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Google rechazó el ingreso');
+      setUser(data.user);
+      navigate(data.user.role === 'admin' ? '/admin' : '/courses');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -95,10 +74,10 @@ export default function Login() {
       <div className="w-full max-w-md bg-[#242424] p-8 rounded-2xl shadow-lg border border-slate-700/50">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-black text-slate-100">
-            {isLogin ? 'Bienvenido de vuelta 👋' : 'Creá tu cuenta 🚀'}
+            {isLogin ? 'Bienvenido de vuelta' : 'Creá tu cuenta'}
           </h2>
           <p className="text-slate-400 mt-2">
-            {isLogin ? 'Ingresá para continuar aprendiendo.' : 'Unite y dominá las inteligencias artificiales.'}
+            {isLogin ? 'Ingresá para continuar aprendiendo.' : 'Unite y seguí las lecciones.'}
           </p>
         </div>
 
@@ -107,7 +86,6 @@ export default function Login() {
             {error}
           </div>
         )}
-        
         {success && (
           <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 text-sm font-medium text-center">
             {success}
@@ -122,54 +100,52 @@ export default function Login() {
                 type="text"
                 required
                 value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-[#1a1a1a] text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-[#1a1a1a] text-slate-200 focus:outline-none focus:border-indigo-500"
                 placeholder="Tu nombre"
               />
             </div>
           )}
-
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">Email</label>
             <input
               type="email"
               required
               value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-              className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-[#1a1a1a] text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-[#1a1a1a] text-slate-200 focus:outline-none focus:border-indigo-500"
               placeholder="correo@ejemplo.com"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">Contraseña</label>
             <input
               type="password"
               required
               value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
-              className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-[#1a1a1a] text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-[#1a1a1a] text-slate-200 focus:outline-none focus:border-indigo-500"
               placeholder="••••••••"
             />
           </div>
-
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-6 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 py-3 rounded-xl font-bold hover:bg-indigo-600/40 hover:text-indigo-300 transition-all disabled:opacity-50"
+            className="w-full mt-6 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 py-3 rounded-xl font-bold disabled:opacity-50"
           >
             {loading ? 'Procesando...' : isLogin ? 'Iniciar Sesión' : 'Registrarse'}
           </button>
         </form>
 
         {googleClientId && (
-          <button
-            type="button"
-            onClick={handleGoogle}
-            className="w-full mt-4 bg-white text-slate-900 py-3 rounded-xl font-bold"
-          >
-            Continuar con Google
-          </button>
+          <div className="mt-4 flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogle}
+              onError={() => setError('Login de Google fallido')}
+              useOneTap={false}
+              text="continue_with"
+            />
+          </div>
         )}
 
         <div className="mt-6 text-center">
@@ -180,7 +156,7 @@ export default function Login() {
               setError('');
               setSuccess('');
             }}
-            className="text-sm font-medium text-slate-400 hover:text-indigo-400 transition-colors"
+            className="text-sm font-medium text-slate-400 hover:text-indigo-400"
           >
             {isLogin ? '¿No tenés cuenta? Registrate acá' : '¿Ya tenés cuenta? Iniciá sesión'}
           </button>
