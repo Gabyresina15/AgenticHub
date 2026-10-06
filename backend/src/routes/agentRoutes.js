@@ -1,9 +1,9 @@
 import express from 'express';
 import { investigarTema } from '../controllers/agentController.js';
+import { requireAuth, requireAdmin } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
-// Ruta POST: /api/agents/research
-router.post('/research', investigarTema);
+router.post('/research', requireAuth, requireAdmin, investigarTema);
 
 export default router;

@@ -29,6 +29,7 @@ export default function Login() {
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(body)
       });
 
@@ -37,13 +38,8 @@ export default function Login() {
       if (!res.ok) throw new Error(data.error || 'Ocurrió un error en la autenticación');
 
       if (isLogin) {
-        // Redirigir según el rol
-        if (data.user.role === 'admin') {
-          setUser(data.user);
-          navigate('/admin');
-        } else {
-          navigate('/courses');
-        }
+        setUser(data.user);
+        navigate(data.user.role === 'admin' ? '/admin' : '/courses');
       } else {
         setIsLogin(true);
         setSuccess('¡Registro exitoso! Ya podés iniciar sesión.');

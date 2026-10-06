@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = 'mi_super_secreto_agentic_hub_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'mi_super_secreto_agentic_hub_2026';
 
 // Middleware para verificar si el usuario está logueado (tiene un token válido)
 export const requireAuth = (req, res, next) => {
