@@ -32,18 +32,55 @@ export async function executeCode({ language, version = "*", code, tests = [], s
   const cases = tests.length ? tests : [{ stdin, expected: null }];
   const results = [];
   for (const test of cases) {
-    const run = await runOnce({ language, version, code, stdin: test.stdin || "" });
-    const stdout = normalize(run.stdout);
-    const expected = test.expected == null ? null : normalize(test.expected);
+    const wrapped = wrapFunctionTest(language, code, test);
+    const run = await runOnce({ language, version, code: wrapped.code, stdin: test.stdin || "" });
+    const parsed = readResult(run.stdout);
+    const returned = wrapped.mode === "return" ? parsed : normalize(run.stdout);
+    const expected = wrapped.mode === "return" ? test.expected : test.expected;
+    const passed = run.code === 0 && sameValue(returned, expected);
     results.push({
-      passed: expected == null ? run.code === 0 : run.code === 0 && stdout === expected,
+      passed: expected == null ? run.code === 0 : passed,
       stdout: run.stdout,
       stderr: run.stderr,
       exitCode: run.code,
-      expected: test.expected ?? null,
+      returned,
+      expected: expected ?? null,
     });
   }
   return { language, passed: results.every((item) => item.passed), results };
+}
+
+function wrapFunctionTest(language, code, test) {
+  if (!test?.fn || !Array.isArray(test.args)) return { code, mode: "stdout" };
+  const args = JSON.stringify(test.args);
+  if (language === "javascript") {
+    return {
+      mode: "return",
+      code: `${code}\nconst __result = ${test.fn}(...${args});\nconsole.log("__RESULT__" + JSON.stringify(__result));`,
+    };
+  }
+  if (language === "python") {
+    return {
+      mode: "return",
+      code: `${code}\nimport json\n__result = ${test.fn}(*json.loads(${JSON.stringify(args)}))\nprint("__RESULT__" + json.dumps(__result, ensure_ascii=False))`,
+    };
+  }
+  return { code, mode: "stdout" };
+}
+
+function readResult(stdout) {
+  const line = String(stdout || "").split(/\r?\n/).find((item) => item.startsWith("__RESULT__"));
+  if (!line) return normalize(stdout);
+  try {
+    return JSON.parse(line.slice("__RESULT__".length));
+  } catch {
+    return line.slice("__RESULT__".length);
+  }
+}
+
+function sameValue(actual, expected) {
+  if (expected == null) return true;
+  return JSON.stringify(actual) === JSON.stringify(expected);
 }
 
 async function runOnce({ language, version, code, stdin }) {

@@ -23,7 +23,7 @@ Sin quizzes en el markdown.`;
 export const CURATOR_JSON_PROMPT = (contenidoTexto) => `Transforma el texto base en un objeto JSON puro.
 Devuelve solo JSON. Sin markdown. Empieza con { y termina con }.
 contentMarkdown no puede incluir la solucion ni el cuerpo implementado. Solo firma y pass.
-hasChallenge debe ser true. tests tiene que tener 2 o 3 casos, no mas.
+hasChallenge debe ser true. tests tiene que tener 2 o 3 casos. Cada test llama una funcion: fn, args y expected son el valor de retorno, no texto impreso. initialCode es solo la firma y pass. Prohibido pedir console.log o print.
 
 {
   "title": "Titulo corto",
@@ -35,7 +35,7 @@ hasChallenge debe ser true. tests tiene que tener 2 o 3 casos, no mas.
     "description": "Que tiene que producir el programa.",
     "language": "python",
     "initialCode": "codigo inicial incompleto",
-    "tests": [{ "stdin": "", "expected": "salida exacta" }],
+    "tests": [{ "fn": "nombreDeLaFuncion", "args": [[1, 2, 3, 4]], "expected": [2, 4] }],
     "solutionKey": "",
     "successMessage": "Paso los tests.",
     "errorMessage": "La salida no coincide."

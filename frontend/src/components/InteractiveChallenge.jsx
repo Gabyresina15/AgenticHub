@@ -26,7 +26,7 @@ export default function InteractiveChallenge({ challenge, onSolve }) {
       const passed = payload.data?.passed;
       const first = payload.data?.results?.[0];
       const detail = first
-        ? `Salio: ${JSON.stringify(first.stdout)} | Esperado: ${JSON.stringify(first.expected)}`
+        ? `Tu funcion devolvio ${JSON.stringify(first.returned)} | El test esperaba ${JSON.stringify(first.expected)}`
         : "";
       setStatus(passed ? 'success' : 'error');
       setFeedback(passed
