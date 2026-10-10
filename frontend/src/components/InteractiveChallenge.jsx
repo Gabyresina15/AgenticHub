@@ -1,10 +1,36 @@
 import { useState } from 'react';
 
-export default function InteractiveChallenge({ challenge, onSolve }) {
+export default function InteractiveChallenge({ challenge, lessonId, onSolve }) {
   const [code, setCode] = useState(challenge.initialCode || '');
   const [status, setStatus] = useState('idle');
   const [feedback, setFeedback] = useState('');
   const language = challenge.language || 'javascript';
+
+  const persistCompletion = async () => {
+    if (!lessonId) {
+      setStatus('success');
+      setFeedback(challenge.successMessage || 'Paso los tests.');
+      if (onSolve) onSolve();
+      return;
+    }
+    const res = await fetch('/api/users/complete-lesson', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ lessonId }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setStatus('error');
+      setFeedback(res.status === 401
+        ? 'Pasaste los tests, pero tenés que iniciar sesión para guardar el progreso.'
+        : data.error || 'Pasaste los tests, pero no se pudo guardar.');
+      return;
+    }
+    setStatus('success');
+    setFeedback(challenge.successMessage || 'Lección completada.');
+    if (onSolve) onSolve(data.completedLessons);
+  };
 
   const handleRunCode = async () => {
     setStatus('checking');
@@ -12,9 +38,12 @@ export default function InteractiveChallenge({ challenge, onSolve }) {
     try {
       if (!challenge.tests?.length) {
         const ok = challenge.solutionKey && code.includes(challenge.solutionKey);
-        setStatus(ok ? 'success' : 'error');
-        setFeedback(ok ? challenge.successMessage : challenge.errorMessage || 'Faltan tests ejecutables en este reto.');
-        if (ok && onSolve) onSolve();
+        if (!ok) {
+          setStatus('error');
+          setFeedback(challenge.errorMessage || 'Faltan tests ejecutables en este reto.');
+          return;
+        }
+        await persistCompletion();
         return;
       }
       const res = await fetch('/api/v1/execute', {
@@ -28,11 +57,12 @@ export default function InteractiveChallenge({ challenge, onSolve }) {
       const detail = first
         ? `Tu funcion devolvio ${JSON.stringify(first.returned)} | El test esperaba ${JSON.stringify(first.expected)}`
         : "";
-      setStatus(passed ? 'success' : 'error');
-      setFeedback(passed
-        ? challenge.successMessage
-        : detail || first?.stderr || payload.data?.message || challenge.errorMessage || 'La salida no coincide con el test.');
-      if (passed && onSolve) onSolve();
+      if (!passed) {
+        setStatus('error');
+        setFeedback(detail || first?.stderr || payload.data?.message || challenge.errorMessage || 'La salida no coincide con el test.');
+        return;
+      }
+      await persistCompletion();
     } catch (error) {
       setStatus('error');
       setFeedback(error.message);

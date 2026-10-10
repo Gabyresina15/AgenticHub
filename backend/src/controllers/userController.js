@@ -1,22 +1,27 @@
 import User from '../models/User.js';
 import Lesson from '../models/Lesson.js';
 
-export const markLessonComplete = async (req, res) => {
+export const completeLesson = async (req, res) => {
   try {
-    const { lessonId } = req.body;
-    const userId = req.user.id;
+    const { lessonId } = req.body || {};
+    if (!lessonId) return res.status(400).json({ error: 'Falta lessonId.' });
+    const lesson = await Lesson.findById(lessonId).select('_id');
+    if (!lesson) return res.status(404).json({ error: 'Lección no encontrada.' });
 
-    // $addToSet evita que se duplique si ya estaba completada
     const updatedUser = await User.findByIdAndUpdate(
-      userId,
+      req.user.id,
       { $addToSet: { completedLessons: lessonId } },
       { returnDocument: 'after' }
     ).select('-password');
 
-    res.status(200).json({ success: true, data: updatedUser });
+    res.status(200).json({
+      success: true,
+      message: 'Lección completada.',
+      completedLessons: updatedUser.completedLessons,
+    });
   } catch (error) {
-    console.error("🔥 Error al marcar lección como completada:", error);
-    res.status(500).json({ error: 'Error al completar la lección' });
+    console.error('Error al completar lección:', error);
+    res.status(500).json({ error: 'Error al marcar la lección como completada' });
   }
 };
 
@@ -90,24 +95,4 @@ export const getUserProfile = async (req, res) => {
   }
 };
 
-export const completeLesson = async (req, res) => {
-  try {
-    const userId = req.user.id; 
-    const { lessonId } = req.body; // Recibimos el ID de la lección por el body
-
-    // Usamos $addToSet para que si ya la completó antes, no se duplique
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { $addToSet: { completedLessons: lessonId } },
-      { new: true }
-    ).select('-password');
-
-    res.status(200).json({ 
-      success: true, 
-      message: '¡Lección completada!', 
-      completedLessons: updatedUser.completedLessons 
-    });
-  } catch (error) {
-    res.status(500).json({ error: 'Error al marcar la lección como completada' });
-  }
 };

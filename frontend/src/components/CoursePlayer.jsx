@@ -62,6 +62,7 @@ export default function CoursePlayer() {
         const res = await fetch('/api/users/complete-lesson', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ lessonId: currentLessonId })
         });
         if (res.ok) {
@@ -151,7 +152,11 @@ export default function CoursePlayer() {
         {currentLesson.challenge && (
           <InteractiveChallenge
             challenge={currentLesson.challenge}
-            onSolve={() => setChallengeSolved(true)}
+            lessonId={currentLessonId}
+            onSolve={() => {
+              setChallengeSolved(true);
+              setCompletedLessons(prev => prev.some(id => String(id) === String(currentLessonId)) ? prev : [...prev, currentLessonId]);
+            }}
           />
         )}
 

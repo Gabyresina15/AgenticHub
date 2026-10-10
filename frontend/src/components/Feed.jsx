@@ -69,7 +69,7 @@ export default function Feed() {
             </div>
 
             {lesson.challenge?.initialCode && (
-              <InteractiveChallenge challenge={lesson.challenge} />
+              <InteractiveChallenge challenge={lesson.challenge} lessonId={lesson._id} />
             )}
 
             {/* Sección del Quiz generado por la IA */}
