@@ -55,7 +55,7 @@ export default function CoursePlayer() {
 
   return (
     <div className="-mx-8 -mt-8 h-[calc(100vh-4.5rem)] p-4 grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)_minmax(0,1.15fr)] gap-4">
-      <aside className="bg-[#242424] p-5 rounded-2xl border border-slate-700/50 overflow-y-auto">
+      <aside className="bg-[#242424] p-5 rounded-2xl border border-slate-700/50 self-start w-full max-h-full overflow-y-auto">
         <Link to="/dashboard" className="text-xs text-indigo-400 hover:underline font-bold">← Volver al Dashboard</Link>
         <h2 className="text-lg font-black text-slate-100 mt-3">{course.title}</h2>
         <p className="text-xs text-slate-400 mt-1">{course.lessons.length} lecciones en total</p>
