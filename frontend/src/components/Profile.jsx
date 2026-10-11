@@ -5,12 +5,26 @@ import { Navigate, Link } from 'react-router-dom';
 export default function Profile() {
   const { user } = useAuth();
   const [profileData, setProfileData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [resetting, setResetting] = useState(false);
+
+  const resetProgress = async () => {
+    setResetting(true);
+    try {
+      const res = await fetch('/api/users/reset-progress', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('No se pudo borrar');
+      setProfileData((prev) => ({ ...prev, completedLessons: [], enrolledCourses: (prev.enrolledCourses || []).map((course) => ({ ...course, progress: 0 })) }));
+    } finally {
+      setResetting(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
     
-    fetch('/api/users/profile')
+    fetch('/api/users/profile', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         setProfileData(data);
@@ -52,6 +66,14 @@ export default function Profile() {
         <div className="bg-[#242424] p-6 rounded-xl border border-slate-700/50">
           <div className="text-slate-400 text-sm font-medium mb-1">Lecciones Completadas</div>
           <div className="text-4xl font-black text-emerald-400">{profileData.completedLessons?.length || 0}</div>
+          <button
+            type="button"
+            onClick={resetProgress}
+            disabled={resetting}
+            className="mt-4 text-sm font-bold text-rose-400 border border-rose-500/30 px-3 py-2 rounded-lg disabled:opacity-50"
+          >
+            {resetting ? 'Borrando...' : 'Borrar progreso'}
+          </button>
         </div>
         <div className="bg-[#242424] p-6 rounded-xl border border-slate-700/50">
           <div className="text-slate-400 text-sm font-medium mb-1">Rol en plataforma</div>

@@ -25,6 +25,19 @@ export const completeLesson = async (req, res) => {
   }
 };
 
+export const resetProgress = async (req, res) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: { completedLessons: [] } },
+      { returnDocument: 'after' }
+    ).select('-password');
+    res.status(200).json({ success: true, completedLessons: [] });
+  } catch (error) {
+    res.status(500).json({ error: 'No se pudo borrar el progreso.' });
+  }
+};
+
 export const enrollInCourse = async (req, res) => {
   try {
     const userId = req.user.id; 
@@ -93,6 +106,4 @@ export const getUserProfile = async (req, res) => {
     console.error("🔥 ERROR AL CARGAR PERFIL:", error);
     res.status(500).json({ error: 'Error al cargar el perfil' });
   }
-};
-
 };
