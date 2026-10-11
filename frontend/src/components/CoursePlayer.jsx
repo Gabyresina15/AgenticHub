@@ -151,6 +151,7 @@ export default function CoursePlayer() {
         {/* 👇 ACÁ INYECTAMOS EL RETO DE PRUEBA 👇 */}
         {currentLesson.challenge && (
           <InteractiveChallenge
+            key={String(currentLessonId)}
             challenge={currentLesson.challenge}
             lessonId={currentLessonId}
             onSolve={() => {
