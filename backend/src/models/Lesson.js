@@ -8,6 +8,8 @@ const lessonSchema = new mongoose.Schema({
   },
   title: { type: String, required: true },
   contentMarkdown: { type: String, required: true },
+  teaches: { type: String, default: '' },
+  howToSolve: { type: String, default: '' },
   order: { type: Number, default: 0 },
   
   lessonType: { type: String, enum: ['teoria', 'quiz', 'reto_codigo'], default: 'teoria' },

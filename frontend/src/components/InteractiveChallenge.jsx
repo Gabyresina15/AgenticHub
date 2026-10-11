@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function InteractiveChallenge({ challenge, lessonId, onSolve }) {
+export default function InteractiveChallenge({ challenge, lessonId, onSolve, fill = false }) {
   const [code, setCode] = useState(challenge.initialCode || '');
   const [status, setStatus] = useState('idle');
   const [feedback, setFeedback] = useState('');
@@ -69,9 +69,11 @@ export default function InteractiveChallenge({ challenge, lessonId, onSolve }) {
     }
   };
 
+  const lines = code.split('\n');
+
   return (
-    <div className="bg-[#1a1a1a] border border-slate-700 rounded-2xl overflow-hidden shadow-xl my-8">
-      <div className="bg-[#242424] px-4 py-3 border-b border-slate-700 flex justify-between items-center">
+    <div className={`bg-[#161616] border border-slate-700 rounded-2xl overflow-hidden shadow-xl flex flex-col min-h-0 ${fill ? 'h-full' : 'my-8'}`}>
+      <div className="bg-[#242424] px-4 py-3 border-b border-slate-700 flex justify-between items-center shrink-0">
         <div className="flex gap-2">
           <div className="w-3 h-3 rounded-full bg-rose-500"></div>
           <div className="w-3 h-3 rounded-full bg-amber-500"></div>
@@ -79,22 +81,27 @@ export default function InteractiveChallenge({ challenge, lessonId, onSolve }) {
         </div>
         <span className="text-xs font-mono text-slate-400">{language}</span>
       </div>
-      <div className="p-6 space-y-4">
-        <div>
-          <h3 className="text-lg font-bold text-indigo-400 mb-2">Desafio: {challenge.title}</h3>
+      <div className="p-5 flex flex-col gap-4 min-h-0 flex-1">
+        <div className="shrink-0">
+          <h3 className="text-lg font-bold text-indigo-400 mb-1">Desafio: {challenge.title}</h3>
           <p className="text-slate-300 text-sm">{challenge.description}</p>
         </div>
-        <textarea
-          value={code}
-          onChange={(e) => {
-            setCode(e.target.value);
-            if (status !== 'idle') setStatus('idle');
-          }}
-          spellCheck="false"
-          className="w-full min-h-[32rem] bg-[#0d0d0d] text-emerald-400 font-mono text-sm p-4 rounded-xl border border-slate-800 focus:outline-none focus:border-indigo-500 transition-colors resize-y leading-relaxed"
-        />
-        <div className="flex items-center justify-between pt-2">
-          <div className="flex-1">
+        <div className="flex-1 min-h-0 flex rounded-xl border border-slate-800 bg-[#0d0d0d] overflow-hidden">
+          <div className="select-none text-slate-600 font-mono text-sm py-4 pl-3 pr-2 text-right overflow-hidden">
+            {lines.map((_, index) => <div key={index} className="leading-relaxed">{index + 1}</div>)}
+          </div>
+          <textarea
+            value={code}
+            onChange={(e) => {
+              setCode(e.target.value);
+              if (status !== 'idle') setStatus('idle');
+            }}
+            spellCheck="false"
+            className="flex-1 min-h-0 bg-transparent text-emerald-400 font-mono text-sm py-4 pr-4 focus:outline-none resize-none leading-relaxed"
+          />
+        </div>
+        <div className="flex items-center justify-between gap-4 shrink-0">
+          <div className="flex-1 min-w-0">
             {status === 'success' && <span className="text-emerald-400 font-bold text-sm">{feedback}</span>}
             {status === 'error' && <span className="text-rose-400 font-bold text-sm">{feedback}</span>}
             {status === 'checking' && <span className="text-amber-400 font-bold text-sm">Compilando y ejecutando...</span>}
@@ -102,7 +109,7 @@ export default function InteractiveChallenge({ challenge, lessonId, onSolve }) {
           <button
             onClick={handleRunCode}
             disabled={status === 'success' || status === 'checking'}
-            className={`px-6 py-2.5 rounded-lg font-bold text-sm transition-all ${
+            className={`px-6 py-2.5 rounded-lg font-bold text-sm shrink-0 ${
               status === 'success'
                 ? 'bg-emerald-600/20 text-emerald-500 border border-emerald-500/30 cursor-not-allowed'
                 : 'bg-indigo-600 text-white hover:bg-indigo-700'

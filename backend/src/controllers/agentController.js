@@ -20,6 +20,8 @@ export const investigarTema = async (req, res) => {
     const lesson = new Lesson({
       title: result.lesson.title,
       contentMarkdown: result.lesson.contentMarkdown,
+      teaches: result.lesson.teaches || '',
+      howToSolve: result.lesson.howToSolve || '',
       lessonType: "reto_codigo",
       quizData: result.lesson.quizData,
       challenge: result.lesson.challenge,

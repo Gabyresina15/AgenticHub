@@ -27,7 +27,9 @@ hasChallenge debe ser true. tests tiene que tener 2 o 3 casos. Cada test llama u
 
 {
   "title": "Titulo corto",
-  "contentMarkdown": "Markdown de teoria y codigo, sin preguntas",
+  "contentMarkdown": "Teoria corta, sin la solucion",
+  "teaches": "Que concepto tiene que entender el alumno",
+  "howToSolve": "Como encarar el hueco, sin pegar la funcion resuelta",
   "quizData": { "question": "...", "options": ["A", "B", "C", "D"], "correctAnswerIndex": 0 },
   "hasChallenge": true,
   "challenge": {

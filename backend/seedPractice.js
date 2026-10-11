@@ -12,7 +12,9 @@ const lessons = [
   {
     title: "Sumar dos numeros",
     order: 1,
-    contentMarkdown: "# Sumar dos numeros\n\nUna funcion pura recibe datos y devuelve un resultado. No imprime: retorna.\n\nCompleta `sumar` para que devuelva la suma de `a` y `b`.",
+    contentMarkdown: "# Sumar dos numeros\n\nUna funcion pura recibe datos y devuelve un resultado. No imprime: retorna.",
+    teaches: "Una funcion recibe argumentos y devuelve un valor. El runner compara ese return, no lo que imprimis.",
+    howToSolve: "Dentro de sumar, devolvé a + b. No hace falta console.log.",
     challenge: {
       title: "Sumar",
       description: "Devolve la suma de los dos numeros.",
@@ -30,7 +32,9 @@ const lessons = [
   {
     title: "Filtrar numeros pares",
     order: 2,
-    contentMarkdown: "# Pares\n\n`filter` arma un array nuevo con los elementos que pasan una condicion. Un numero es par si `n % 2 === 0`.",
+    contentMarkdown: "# Pares\n\n`filter` arma un array nuevo con los elementos que pasan una condicion.",
+    teaches: "Un numero es par si el resto de dividirlo por 2 es 0. Podes recorrerlo con filter o con un bucle.",
+    howToSolve: "Devolvé un array nuevo, solo con los numeros donde n % 2 === 0. No modifiques el original.",
     challenge: {
       title: "Pares",
       description: "Devolve un array solo con los numeros pares.",
@@ -48,7 +52,9 @@ const lessons = [
   {
     title: "El mayor de una lista",
     order: 3,
-    contentMarkdown: "# Maximo\n\nRecorré la lista y conserva el mayor valor visto. Si la lista esta vacia, devolvé `null`.",
+    contentMarkdown: "# Maximo\n\nRecorré la lista y conservá el mayor valor visto.",
+    teaches: "Para encontrar un maximo hay que mirar todos los elementos. Una lista vacia no tiene mayor.",
+    howToSolve: "Si numeros esta vacio, devolvé null. Si no, recorrelo y quedate con el mayor.",
     challenge: {
       title: "Maximo",
       description: "Devolve el numero mas grande, o null si no hay elementos.",
