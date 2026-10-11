@@ -18,7 +18,7 @@ export default function App() {
       <BrowserRouter>
         <div className="min-h-screen bg-[#1a1a1a] text-slate-200 font-sans selection:bg-indigo-500/30">
           <Navbar />
-          <main className="max-w-5xl mx-auto p-8">
+          <main className="max-w-7xl mx-auto p-8">
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/feed" element={<Feed />} />

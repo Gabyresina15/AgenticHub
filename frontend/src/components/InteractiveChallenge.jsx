@@ -91,7 +91,7 @@ export default function InteractiveChallenge({ challenge, lessonId, onSolve }) {
             if (status !== 'idle') setStatus('idle');
           }}
           spellCheck="false"
-          className="w-full h-48 bg-[#0d0d0d] text-emerald-400 font-mono text-sm p-4 rounded-xl border border-slate-800 focus:outline-none focus:border-indigo-500 transition-colors resize-none leading-relaxed"
+          className="w-full min-h-[32rem] bg-[#0d0d0d] text-emerald-400 font-mono text-sm p-4 rounded-xl border border-slate-800 focus:outline-none focus:border-indigo-500 transition-colors resize-y leading-relaxed"
         />
         <div className="flex items-center justify-between pt-2">
           <div className="flex-1">
