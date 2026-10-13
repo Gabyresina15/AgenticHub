@@ -16,7 +16,7 @@ export default function AdminPanel() {
   const [newLessonContent, setNewLessonContent] = useState('');
   const [newLessonVideoUrl, setNewLessonVideoUrl] = useState('');
   const [isCreatingLesson, setIsCreatingLesson] = useState(false);
-  const [feedbackMsg, setFeedbackMsg] = useState('');
+  const [postForm, setPostForm] = useState({ title: '', tag: 'Actualización', summary: '', body: '' });
 
   // Estados para Modales (Confirmación y Edición)
   const [modalConfig, setModalConfig] = useState({
@@ -101,6 +101,17 @@ export default function AdminPanel() {
         }
       }
     });
+  };
+
+  const handleCreatePost = async (e) => {
+    e.preventDefault();
+    const res = await fetch('/api/posts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(postForm),
+    });
+    if (res.ok) setPostForm({ title: '', tag: 'Actualización', summary: '', body: '' });
   };
 
   const handleResearch = async (e) => {
@@ -456,6 +467,17 @@ export default function AdminPanel() {
           >
             {isAgentWorking ? 'Investigando...' : 'Generar Lección'}
           </button>
+        </form>
+      </div>
+
+      <div className="bg-[#242424] p-8 rounded-2xl border border-slate-700/50">
+        <h2 className="text-2xl font-black text-slate-100 mb-2">Novedad para Explorar</h2>
+        <p className="text-slate-400 mb-6">Esto no crea una lección. Sale en Explorar.</p>
+        <form onSubmit={handleCreatePost} className="space-y-3">
+          <input value={postForm.title} onChange={(e) => setPostForm({ ...postForm, title: e.target.value })} placeholder="Título" className="w-full px-4 py-3 rounded-lg border border-slate-700 bg-[#1a1a1a] text-slate-200" required />
+          <input value={postForm.tag} onChange={(e) => setPostForm({ ...postForm, tag: e.target.value })} placeholder="Etiqueta" className="w-full px-4 py-3 rounded-lg border border-slate-700 bg-[#1a1a1a] text-slate-200" />
+          <textarea value={postForm.body} onChange={(e) => setPostForm({ ...postForm, body: e.target.value })} placeholder="Texto" className="w-full h-28 px-4 py-3 rounded-lg border border-slate-700 bg-[#1a1a1a] text-slate-200" required />
+          <button className="bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-bold">Publicar novedad</button>
         </form>
       </div>
 

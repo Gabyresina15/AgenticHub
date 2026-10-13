@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { connectDB } from "./src/config/db.js";
 import Course from "./src/models/Course.js";
 import Lesson from "./src/models/Lesson.js";
+import Post from "./src/models/Post.js";
 
 dotenv.config();
 
@@ -97,6 +98,24 @@ async function seedPractice() {
     { _id: { $in: course.lessons } },
     { courseId: course._id }
   );
+
+  const posts = [
+    {
+      title: "AgenticHub ya corre retos de verdad",
+      tag: "Avance",
+      summary: "El editor llama a la función y compara el return. Python y JavaScript corren en local.",
+      body: "Dejamos de comparar texto impreso. El alumno escribe la función, el runner la llama con los casos y guarda la lección como completada.\n\nExplorar queda para novedades. Las lecciones viven en los cursos.",
+    },
+    {
+      title: "Qué está pasando con los agentes en 2026",
+      tag: "IA",
+      summary: "Menos demos, más sistemas que hacen un trabajo concreto.",
+      body: "La novedad no es otro chatbot. Es un sistema con un router, herramientas y un contrato de salida.\n\nEso es lo que estamos construyendo: agentes que automatizan trabajo real, y una academia para aprender a armarlos.",
+    },
+  ];
+  for (const post of posts) {
+    await Post.updateOne({ title: post.title }, post, { upsert: true });
+  }
 
   console.log(`Curso listo: ${course.title} (${created.length} lecciones).`);
   await mongoose.disconnect();

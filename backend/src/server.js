@@ -8,6 +8,7 @@ import courseRoutes from "./routes/courseRoutes.js";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import postRoutes from "./routes/postRoutes.js";
 import orchestratorRoutes from "./routes/orchestrator.js";
 
 dotenv.config();
@@ -30,6 +31,7 @@ app.use("/api/lessons", lessonRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/posts", postRoutes);
 app.use(errorHandler);
 
 app.listen(PORT, "0.0.0.0", () => {
