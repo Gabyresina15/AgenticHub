@@ -5,7 +5,8 @@ import Path from '../models/Path.js';
 // 1. Obtener todos los cursos (con sus lecciones pobladas)
 export const getCourses = async (req, res) => {
   try {
-    const courses = await Course.find().populate('lessons');
+    const filter = req.query.all === 'true' ? {} : { published: true };
+    const courses = await Course.find(filter).populate('lessons');
     const data = courses.map((course) => {
       const plain = course.toObject();
       const fromLesson = (plain.lessons || []).find((lesson) => lesson.challenge?.language)?.challenge.language;
@@ -60,6 +61,7 @@ export const createCourse = async (req, res) => {
       title,
       description,
       level: level || 'Básico',
+      published: true,
       lessons: []
     });
 

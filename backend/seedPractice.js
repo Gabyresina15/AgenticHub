@@ -14,7 +14,7 @@ const courses = [
     description: "Funciones, condiciones y el primer return. El arranque de la ruta.",
     level: "Básico",
     language: "javascript",
-    track: "logica",
+    published: true,
     lessons: [
       {
         title: "Sumar dos numeros",
@@ -83,7 +83,7 @@ const courses = [
     description: "Recorrer, contar y armar arrays. El segundo tramo.",
     level: "Básico",
     language: "javascript",
-    track: "logica",
+    published: true,
     lessons: [
       {
         title: "Contar elementos",
@@ -132,7 +132,7 @@ const courses = [
     description: "Una funcion que usa lo que ya sabes. El cierre de la ruta.",
     level: "Básico",
     language: "javascript",
-    track: "logica",
+    published: true,
     lessons: [
       {
         title: "Promedio",
@@ -194,6 +194,7 @@ async function replaceCourse(spec) {
     level: spec.level,
     language: spec.language,
     track: spec.track,
+    published: spec.published,
     lessons: created.map((lesson) => lesson._id),
   });
   await Lesson.updateMany({ _id: { $in: course.lessons } }, { courseId: course._id });
@@ -204,6 +205,10 @@ async function seedPractice() {
   await connectDB();
   const saved = [];
   for (const spec of courses) saved.push(await replaceCourse(spec));
+  await Course.updateMany(
+    { _id: { $nin: saved.map((course) => course._id) } },
+    { published: false }
+  );
 
   const posts = [
     {

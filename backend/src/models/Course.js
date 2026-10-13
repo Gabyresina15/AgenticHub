@@ -6,6 +6,7 @@ const courseSchema = new mongoose.Schema({
   level: { type: String, enum: ['Básico', 'Intermedio', 'Avanzado'], default: 'Básico' },
   language: { type: String, default: 'general' },
   track: { type: String, default: '' },
+  published: { type: Boolean, default: false },
   lessons: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Lesson' }]
 }, { timestamps: true });
 

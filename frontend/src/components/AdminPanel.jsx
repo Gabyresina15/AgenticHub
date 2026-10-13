@@ -67,7 +67,7 @@ export default function AdminPanel() {
   const fetchCoursesAndLessons = async () => {
     try {
       const [coursesRes, lessonsRes] = await Promise.all([
-        fetch('/api/courses'),
+        fetch('/api/courses?all=true'),
         fetch('/api/lessons')
       ]);
       const coursesData = await coursesRes.json();
