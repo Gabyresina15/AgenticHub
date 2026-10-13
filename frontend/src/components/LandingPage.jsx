@@ -2,24 +2,19 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function LandingPage() {
-    const [lessons, setLessons] = useState([]);
+    const [posts, setPosts] = useState([]);
+    const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Traemos las lecciones para alimentar el Newsletter público
-        fetch('/api/lessons')
-            .then(res => res.json())
-            .then(data => {
-                const allLessons = data.data || [];
-                // Filtramos solo las que están publicadas
-                const publicLessons = allLessons.filter(l => l.status === 'published' || !l.status);
-                setLessons(publicLessons);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error("Error cargando el newsletter:", err);
-                setLoading(false);
-            });
+        Promise.all([
+            fetch('/api/posts').then(res => res.json()).catch(() => ({ data: [] })),
+            fetch('/api/courses').then(res => res.json()).catch(() => ({ data: [] })),
+        ]).then(([postData, courseData]) => {
+            setPosts(postData.data || []);
+            setCourses(courseData.data || courseData || []);
+            setLoading(false);
+        });
     }, []);
 
     return (
@@ -45,7 +40,7 @@ export default function LandingPage() {
 
                     {/* Botón secundario: va directo al Feed para probar */}
                     <Link to="/feed" className="px-8 py-4 rounded-xl font-bold text-lg bg-[#242424] text-slate-300 border border-slate-700 hover:bg-slate-800 transition-all">
-                        Explorar clases
+                        Ver novedades
                     </Link>
                 </div>
             </section>
@@ -64,45 +59,49 @@ export default function LandingPage() {
 
                     {loading ? (
                         <div className="text-center font-bold text-slate-500 text-xl">Cargando las últimas novedades... 📡</div>
-                    ) : lessons.length === 0 ? (
+                    ) : posts.length === 0 ? (
                         <div className="text-center text-slate-500 italic bg-[#242424] p-12 rounded-2xl border border-slate-700/50 max-w-3xl mx-auto">
                             Aún no hay contenido publicado en el newsletter. ¡Vuelve pronto!
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {lessons.map(lesson => (
+                            {posts.map(post => (
                                 <Link
-                                    key={lesson._id}
-                                    to={`/feed/${lesson._id}`}
+                                    key={post._id}
+                                    to={`/feed/${post._id}`}
                                     className="bg-[#242424] p-8 rounded-2xl border border-slate-700/50 flex flex-col justify-between space-y-4 shadow-lg hover:border-indigo-500/50 hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
                                 >
                                     <div>
                                         <div className="flex items-center gap-2 mb-3">
-                                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                                            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Nueva Lección</span>
+                                            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">{post.tag || 'Novedad'}</span>
                                         </div>
                                         <h3 className="text-xl font-bold text-slate-100 line-clamp-2 leading-tight group-hover:text-indigo-400 transition-colors">
-                                            {lesson.title}
+                                            {post.title}
                                         </h3>
                                         <p className="text-slate-400 text-sm mt-4 line-clamp-3 leading-relaxed">
-                                            {lesson.content || lesson.contentMarkdown || 'Contenido audiovisual sin descripción detallada disponible.'}
+                                            {post.summary || post.body}
                                         </p>
                                     </div>
-
-                                    {/* FOOTER DE LA TARJETA */}
-                                    <div className="pt-6 border-t border-slate-700/50 flex justify-between items-center text-xs text-slate-400 mt-auto">
-                                        <span className="flex items-center gap-1">
-                                            {lesson.videoUrl ? '🎥 Video' : '📝 Artículo'}
-                                        </span>
-
-                                        <span className="bg-emerald-500/10 text-emerald-400 font-bold px-4 py-2 rounded-lg border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors">
-                                            Leer gratis 👀
-                                        </span>
+                                    <div className="pt-6 border-t border-slate-700/50 flex justify-end text-xs">
+                                        <span className="bg-emerald-500/10 text-emerald-400 font-bold px-4 py-2 rounded-lg border border-emerald-500/20">Leer</span>
                                     </div>
                                 </Link>
                             ))}
                         </div>
                     )}
+                </div>
+            </section>
+
+            <section className="max-w-7xl mx-auto px-4 py-16">
+                <h2 className="text-3xl font-black text-slate-100 mb-8">Cursos</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {(Array.isArray(courses) ? courses : []).map(course => (
+                        <Link key={course._id} to={`/course/${course._id}`} className="bg-[#242424] p-6 rounded-2xl border border-slate-700/50">
+                            <h3 className="text-xl font-bold text-slate-100">{course.title}</h3>
+                            <p className="text-slate-400 mt-2 text-sm">{course.description}</p>
+                        </Link>
+                    ))}
                 </div>
             </section>
 

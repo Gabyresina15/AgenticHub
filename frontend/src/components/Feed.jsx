@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 export default function Feed() {
+  const { id } = useParams();
   const [posts, setPosts] = useState([]);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -9,11 +11,16 @@ export default function Feed() {
     fetch('/api/posts')
       .then((res) => res.json())
       .then((data) => {
-        setPosts(data.data || []);
+        const fetched = data.data || [];
+        setPosts(fetched);
+        if (id) {
+          const found = fetched.findIndex((post) => post._id === id);
+          if (found >= 0) setIndex(found);
+        }
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, []);
+  }, [id]);
 
   if (loading) return <div className="text-center mt-20 text-slate-400 font-bold">Cargando...</div>;
   if (!posts.length) return <div className="text-center mt-20 text-slate-400 font-bold">Todavía no hay novedades.</div>;
