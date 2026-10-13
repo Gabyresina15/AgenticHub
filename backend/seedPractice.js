@@ -4,6 +4,7 @@ import { connectDB } from "./src/config/db.js";
 import Course from "./src/models/Course.js";
 import Lesson from "./src/models/Lesson.js";
 import Post from "./src/models/Post.js";
+import Path from "./src/models/Path.js";
 
 dotenv.config();
 
@@ -92,6 +93,8 @@ async function seedPractice() {
     title: COURSE_TITLE,
     description: "Ruta fija para probar el editor, los tests y el progreso. No usa Gemini.",
     level: "Básico",
+    language: "javascript",
+    track: "logica",
     lessons: created.map((lesson) => lesson._id),
   });
   await Lesson.updateMany(
@@ -117,7 +120,17 @@ async function seedPractice() {
     await Post.updateOne({ title: post.title }, post, { upsert: true });
   }
 
-  console.log(`Curso listo: ${course.title} (${created.length} lecciones).`);
+  await Path.updateOne(
+    { slug: "logica" },
+    {
+      slug: "logica",
+      title: "Lógica de programación",
+      description: "Funciones, listas y condiciones. El primer tramo, en JavaScript.",
+      level: "Básico",
+      courses: [course._id],
+    },
+    { upsert: true }
+  );
   await mongoose.disconnect();
 }
 

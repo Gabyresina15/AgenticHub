@@ -1,109 +1,99 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+const LEVELS = ['Todos', 'Básico', 'Intermedio', 'Avanzado'];
+const LANGUAGES = ['Todos', 'javascript', 'python', 'general'];
 
 export default function CoursesView() {
   const [courses, setCourses] = useState([]);
+  const [paths, setPaths] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [enrollingId, setEnrollingId] = useState(null);
-  const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [query, setQuery] = useState('');
+  const [level, setLevel] = useState('Todos');
+  const [language, setLanguage] = useState('Todos');
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. Cargamos los cursos y los datos del usuario en paralelo para saber a cuáles está inscripto
     Promise.all([
-      fetch('/api/courses').then(res => res.json()),
-      fetch('/api/users/profile').then(res => res.json()).catch(() => null)
-    ])
-      .then(([coursesData, profileData]) => {
-        setCourses(coursesData.data || coursesData || []);
-        if (profileData && profileData.enrolledCourses) {
-          // Guardamos un array con los IDs de los cursos a los que ya está inscripto
-          const enrolledIds = profileData.enrolledCourses.map(c => c._id || c);
-          setEnrolledCourses(enrolledIds);
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Error al cargar datos:", err);
-        setLoading(false);
-      });
+      fetch('/api/courses').then((res) => res.json()),
+      fetch('/api/courses/paths').then((res) => res.json()).catch(() => ({ data: [] })),
+    ]).then(([courseData, pathData]) => {
+      setCourses(courseData.data || []);
+      setPaths(pathData.data || []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
   }, []);
 
-  const handleEnroll = async (courseId) => {
-    setEnrollingId(courseId);
-    try {
-      const res = await fetch('/api/users/enroll', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseId })
-      });
+  const filtered = useMemo(() => courses.filter((course) => {
+    const text = `${course.title} ${course.description || ''}`.toLowerCase();
+    const matchesQuery = text.includes(query.toLowerCase());
+    const matchesLevel = level === 'Todos' || course.level === level;
+    const matchesLanguage = language === 'Todos' || (course.language || 'general') === language;
+    return matchesQuery && matchesLevel && matchesLanguage;
+  }), [courses, query, level, language]);
 
-      if (res.ok) {
-        setEnrolledCourses(prev => [...prev, courseId]);
-      }
-    } catch (err) {
-      console.error('Error en inscripción', err);
-    } finally {
-      setEnrollingId(null);
-    }
-  };
-
-  if (loading) return <div className="text-center mt-20 text-xl font-bold text-slate-300">Cargando niveles... ⏳</div>;
+  if (loading) return <div className="text-center mt-20 text-slate-400 font-bold">Cargando...</div>;
 
   return (
-    <div className="max-w-5xl mx-auto py-12 px-4 space-y-12">
-      <header className="text-center space-y-4">
-        <h1 className="text-4xl font-black text-slate-100 tracking-tight">Rutas de Aprendizaje 🚀</h1>
-        <p className="text-lg text-slate-400">Elegí tu nivel y empezá a dominar las inteligencias artificiales.</p>
+    <div className="max-w-6xl mx-auto py-10 space-y-12">
+      <header className="space-y-3">
+        <h1 className="text-4xl font-black text-slate-100">Cursos</h1>
+        <p className="text-slate-400">Filtrá por lenguaje y dificultad. Las rutas son el orden, no otro catálogo.</p>
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Buscar curso"
+          className="w-full max-w-md px-4 py-3 rounded-xl border border-slate-700 bg-[#242424] text-slate-200"
+        />
+        <div className="flex flex-wrap gap-2">
+          {LEVELS.map((item) => (
+            <button key={item} onClick={() => setLevel(item)} className={`px-3 py-1.5 rounded-full text-sm border ${level === item ? 'border-indigo-500 text-indigo-300' : 'border-slate-700 text-slate-400'}`}>{item}</button>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {LANGUAGES.map((item) => (
+            <button key={item} onClick={() => setLanguage(item)} className={`px-3 py-1.5 rounded-full text-sm border ${language === item ? 'border-emerald-500 text-emerald-300' : 'border-slate-700 text-slate-400'}`}>{item}</button>
+          ))}
+        </div>
       </header>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {courses.map(course => {
-          const isAlreadyEnrolled = enrolledCourses.includes(course._id);
-          const isThisEnrolling = enrollingId === course._id;
-
-          return (
-            <div key={course._id} className="bg-[#242424] rounded-2xl p-8 shadow-lg border border-slate-700/50 hover:border-indigo-500/50 transition-all flex flex-col h-full group">
-              
-              <div className="mb-4">
-                <span className="inline-block px-3 py-1 bg-indigo-500/10 text-indigo-400 text-xs font-black uppercase tracking-wider rounded-full mb-4 border border-indigo-500/20">
-                  Nivel {course.level || 'General'}
-                </span>
-                <h2 className="text-2xl font-bold text-slate-100 mb-2 group-hover:text-indigo-400 transition-colors">{course.title}</h2>
-                <p className="text-slate-400 text-sm leading-relaxed line-clamp-3">
-                  {course.description || 'Sin descripción disponible.'}
-                </p>
+      <section className="space-y-4">
+        <h2 className="text-2xl font-black text-slate-100">Rutas</h2>
+        {paths.length === 0 && <p className="text-slate-500">Todavía no hay rutas. Corré el seed de práctica.</p>}
+        {paths.map((path) => (
+          <article key={path._id} className="bg-[#242424] rounded-2xl border border-slate-700/50 p-6">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h3 className="text-xl font-bold text-slate-100">{path.title}</h3>
+                <p className="text-slate-400 text-sm mt-1">{path.description}</p>
               </div>
-
-              <div className="mt-auto pt-6 border-t border-slate-700/50 space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-slate-500">
-                    📚 {course.lessons?.length || 0} lecciones
-                  </span>
-                </div>
-
-                {/* Botón de Inscribirse / Ir al Curso */}
-                {isAlreadyEnrolled ? (
-                  <button
-                    onClick={() => navigate(`/course/${course._id}`)}
-                    className="w-full bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 py-3 rounded-xl font-bold hover:bg-emerald-600/40 transition-all text-center shadow-lg shadow-emerald-500/10"
-                  >
-                    📖 Ir al Reproductor 🚀
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleEnroll(course._id)}
-                    disabled={isThisEnrolling}
-                    className="w-full bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 py-3 rounded-xl font-bold hover:bg-indigo-600/40 hover:text-indigo-300 transition-all text-center shadow-lg shadow-indigo-500/10 disabled:opacity-50"
-                  >
-                    {isThisEnrolling ? 'Inscribiendo...' : '🚀 Inscribirme ahora'}
-                  </button>
-                )}
-              </div>
+              <span className="text-xs uppercase tracking-wider text-indigo-300">{path.level}</span>
             </div>
-          );
-        })}
-      </div>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {(path.courses || []).map((course, index) => (
+                <button key={course._id} onClick={() => navigate(`/course/${course._id}`)} className="px-4 py-2 rounded-xl bg-[#1a1a1a] border border-slate-800 text-slate-200 text-sm">
+                  {index + 1}. {course.title}
+                </button>
+              ))}
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filtered.map((course) => (
+          <button key={course._id} onClick={() => navigate(`/course/${course._id}`)} className="text-left bg-[#242424] rounded-2xl p-6 border border-slate-700/50">
+            <div className="flex gap-2 text-xs uppercase tracking-wider text-slate-500">
+              <span>{course.level || 'General'}</span>
+              <span>{course.language || 'general'}</span>
+            </div>
+            <h2 className="text-xl font-bold text-slate-100 mt-3">{course.title}</h2>
+            <p className="text-slate-400 text-sm mt-2 line-clamp-3">{course.description}</p>
+            <p className="text-slate-500 text-sm mt-4">{course.lessons?.length || 0} lecciones</p>
+          </button>
+        ))}
+        {filtered.length === 0 && <p className="text-slate-500">Ningún curso con esos filtros.</p>}
+      </section>
     </div>
   );
 }

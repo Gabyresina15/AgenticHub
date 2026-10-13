@@ -3,6 +3,7 @@ import {
   getCourses, 
   createCourse, 
   getCourseById, 
+  getPaths, 
   addLessonToCourse, 
   updateCourse, 
   deleteCourse, 
@@ -14,6 +15,7 @@ const router = express.Router();
 
 // Rutas de Cursos
 router.get('/', getCourses);
+router.get('/paths', getPaths);
 router.get('/:id', getCourseById);
 
 // Rutas protegidas (Admin)

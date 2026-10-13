@@ -1,14 +1,30 @@
 import Course from '../models/Course.js';
 import Lesson from '../models/Lesson.js';
+import Path from '../models/Path.js';
 
 // 1. Obtener todos los cursos (con sus lecciones pobladas)
 export const getCourses = async (req, res) => {
   try {
     const courses = await Course.find().populate('lessons');
-    res.status(200).json({ success: true, data: courses });
+    const data = courses.map((course) => {
+      const plain = course.toObject();
+      const fromLesson = (plain.lessons || []).find((lesson) => lesson.challenge?.language)?.challenge.language;
+      plain.language = plain.language && plain.language !== 'general' ? plain.language : (fromLesson || 'general');
+      return plain;
+    });
+    res.status(200).json({ success: true, data });
   } catch (error) {
     console.error("❌ Error al obtener los cursos:", error);
     res.status(500).json({ error: "Error al obtener los cursos" });
+  }
+};
+
+export const getPaths = async (req, res) => {
+  try {
+    const paths = await Path.find().populate({ path: 'courses', populate: { path: 'lessons' } });
+    res.status(200).json({ success: true, data: paths });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener las rutas' });
   }
 };
 

@@ -8,17 +8,10 @@ const router = express.Router();
 router.get('/', getPublishedLessons);
 
 // GET: /api/lessons/drafts -> Lista todos los borradores pendientes
-router.get('/drafts', getDrafts);
-
-// PATCH: /api/lessons/:id/publish -> Publica una lección específica por su ID
-router.patch('/:id/publish', publishLesson);
-
-// GET: /api/lessons/:id -> Obtiene una lección específica por su ID (PROTEGIDA)
+router.get('/drafts', requireAuth, requireAdmin, getDrafts);
+router.patch('/:id/publish', requireAuth, requireAdmin, publishLesson);
 router.get('/:id', requireAuth, getLessonById);
-
-// NUEVA RUTA: La que tu AdminPanel está buscando (POST /api/lessons)
-// Podés protegerla con requireAuth y requireAdmin cuando el sistema esté estable
-router.post('/', createManualLesson);
+router.post('/', requireAuth, requireAdmin, createManualLesson);
 
 router.put('/:id', requireAuth, requireAdmin, updateLesson);
 router.delete('/:id', requireAuth, requireAdmin, deleteLesson);
