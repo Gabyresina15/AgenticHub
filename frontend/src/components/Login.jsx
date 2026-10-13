@@ -76,12 +76,12 @@ export default function Login() {
           <p className="text-xs uppercase tracking-[0.25em] text-indigo-300">AgenticHub</p>
           <div>
             <h1 className="text-4xl font-black text-slate-100 leading-tight">
-              Aprendé a programar
-              <span className="block text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-emerald-400">resolviendo funciones.</span>
+              Entrá a la
+              <span className="block text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-emerald-400">ruta.</span>
             </h1>
-            <p className="text-slate-400 mt-4">La ruta está abierta. La cuenta guarda el progreso.</p>
+            <p className="text-slate-400 mt-4">Completás la función, corrés los tests y el progreso queda guardado.</p>
           </div>
-          <p className="text-sm text-slate-500">Lógica, listas y funciones. En ese orden.</p>
+          <p className="text-sm text-slate-500">Las lecciones las puede armar un agente. El código lo corrés vos.</p>
         </div>
 
         <div className="p-8 md:p-10">
