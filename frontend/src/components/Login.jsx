@@ -70,85 +70,87 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-[#242424] p-8 rounded-2xl shadow-lg border border-slate-700/50">
-        <div className="text-center mb-8">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-4xl grid md:grid-cols-2 bg-[#242424] rounded-3xl border border-slate-700/50 overflow-hidden">
+        <div className="hidden md:flex flex-col justify-between p-10 bg-[#1a1a1a] border-r border-slate-800">
+          <p className="text-xs uppercase tracking-[0.25em] text-indigo-300">AgenticHub</p>
+          <div>
+            <h1 className="text-4xl font-black text-slate-100 leading-tight">
+              Aprendé a programar
+              <span className="block text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-emerald-400">resolviendo funciones.</span>
+            </h1>
+            <p className="text-slate-400 mt-4">La ruta está abierta. La cuenta guarda el progreso.</p>
+          </div>
+          <p className="text-sm text-slate-500">Lógica, listas y funciones. En ese orden.</p>
+        </div>
+
+        <div className="p-8 md:p-10">
           <h2 className="text-3xl font-black text-slate-100">
             {isLogin ? 'Bienvenido de vuelta' : 'Creá tu cuenta'}
           </h2>
           <p className="text-slate-400 mt-2">
-            {isLogin ? 'Ingresá para continuar aprendiendo.' : 'Unite y seguí las lecciones.'}
+            {isLogin ? 'Entrá para seguir donde lo dejaste.' : 'El registro es gratis.'}
           </p>
-        </div>
 
-        {error && (
-          <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-sm font-medium text-center">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 text-sm font-medium text-center">
-            {success}
-          </div>
-        )}
+          {error && <div className="mt-6 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-300 text-sm">{error}</div>}
+          {success && <div className="mt-6 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 text-sm">{success}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">Nombre</label>
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+            {!isLogin && (
               <input
                 type="text"
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-[#1a1a1a] text-slate-200 focus:outline-none focus:border-indigo-500"
-                placeholder="Tu nombre"
+                className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-[#121212] text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
+                placeholder="Nombre"
               />
-            </div>
-          )}
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">Email</label>
+            )}
             <input
               type="email"
               required
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-[#1a1a1a] text-slate-200 focus:outline-none focus:border-indigo-500"
-              placeholder="correo@ejemplo.com"
+              className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-[#121212] text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
+              placeholder="Email"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">Contraseña</label>
             <input
               type="password"
               required
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-[#1a1a1a] text-slate-200 focus:outline-none focus:border-indigo-500"
-              placeholder="••••••••"
+              className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-[#121212] text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
+              placeholder="Contraseña"
             />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full mt-6 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 py-3 rounded-xl font-bold disabled:opacity-50"
-          >
-            {loading ? 'Procesando...' : isLogin ? 'Iniciar Sesión' : 'Registrarse'}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold disabled:opacity-50"
+            >
+              {loading ? 'Procesando...' : isLogin ? 'Iniciar sesión' : 'Registrarse'}
+            </button>
+          </form>
 
-        {googleClientId && (
-          <div className="mt-4 flex justify-center">
-            <GoogleLogin
-              onSuccess={handleGoogle}
-              onError={() => setError('Login de Google fallido')}
-              useOneTap={false}
-              text="continue_with"
-            />
-          </div>
-        )}
+          {googleClientId && (
+            <div className="mt-5">
+              <div className="flex items-center gap-3 text-xs uppercase tracking-wider text-slate-500 mb-4">
+                <span className="flex-1 h-px bg-slate-800" />
+                o
+                <span className="flex-1 h-px bg-slate-800" />
+              </div>
+              <div className="flex justify-center">
+                <GoogleLogin
+                  onSuccess={handleGoogle}
+                  onError={() => setError('Login de Google fallido')}
+                  useOneTap={false}
+                  text="continue_with"
+                  theme="filled_black"
+                  shape="pill"
+                />
+              </div>
+            </div>
+          )}
 
-        <div className="mt-6 text-center">
           <button
             type="button"
             onClick={() => {
@@ -156,12 +158,13 @@ export default function Login() {
               setError('');
               setSuccess('');
             }}
-            className="text-sm font-medium text-slate-400 hover:text-indigo-400"
+            className="mt-6 w-full text-sm text-slate-400 hover:text-indigo-300"
           >
-            {isLogin ? '¿No tenés cuenta? Registrate acá' : '¿Ya tenés cuenta? Iniciá sesión'}
+            {isLogin ? '¿No tenés cuenta? Registrate' : '¿Ya tenés cuenta? Iniciá sesión'}
           </button>
         </div>
       </div>
     </div>
   );
 }
+
