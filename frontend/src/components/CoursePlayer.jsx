@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 import InteractiveChallenge from './InteractiveChallenge';
 
 export default function CoursePlayer() {
@@ -33,8 +34,8 @@ export default function CoursePlayer() {
   const currentLesson = course.lessons[currentLessonIndex];
   const currentLessonId = currentLesson._id || currentLesson;
   const isCurrentCompleted = completedLessons.some(lId => (lId._id || lId).toString() === currentLessonId.toString());
-  const hasChallenge = currentLesson.challenge != null;
-  const canAdvance = !hasChallenge || challengeSolved || isCurrentCompleted;
+  const hasRealChallenge = Boolean(currentLesson.challenge?.initialCode || currentLesson.challenge?.tests?.length);
+  const canAdvance = !hasRealChallenge || challengeSolved || isCurrentCompleted;
 
   const handleNextLesson = async () => {
     if (!isCurrentCompleted) {
@@ -54,7 +55,7 @@ export default function CoursePlayer() {
   };
 
   return (
-    <div className="-mx-8 -mt-8 h-[calc(100vh-4.5rem)] p-4 grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)_minmax(0,1.15fr)] gap-4">
+    <div className={`-mx-8 -mt-8 h-[calc(100vh-4.5rem)] p-4 grid grid-cols-1 gap-4 ${hasRealChallenge ? 'lg:grid-cols-[220px_minmax(0,1fr)_minmax(0,1.15fr)]' : 'lg:grid-cols-[220px_minmax(0,1fr)]'}`}>
       <aside className="bg-[#242424] p-5 rounded-2xl border border-slate-700/50 self-start w-full max-h-full overflow-y-auto">
         <Link to="/dashboard" className="text-xs text-indigo-400 hover:underline font-bold">← Volver al Dashboard</Link>
         <h2 className="text-lg font-black text-slate-100 mt-3">{course.title}</h2>
@@ -88,8 +89,10 @@ export default function CoursePlayer() {
             {isCurrentCompleted ? 'Completada ✓' : 'En progreso'}
           </span>
         </div>
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5 text-slate-300">
-          <div className="whitespace-pre-line leading-relaxed">{currentLesson.contentMarkdown || currentLesson.content || 'Sin contenido.'}</div>
+        <div className={`flex-1 overflow-y-auto px-8 py-6 space-y-5 text-slate-300 ${hasRealChallenge ? '' : 'max-w-3xl'}`}>
+          <div className="prose prose-invert max-w-none leading-relaxed">
+            <ReactMarkdown>{currentLesson.contentMarkdown || currentLesson.content || 'Sin contenido.'}</ReactMarkdown>
+          </div>
           {currentLesson.teaches && (
             <div>
               <h2 className="text-slate-100 font-bold mb-2">Qué te enseña</h2>
@@ -111,8 +114,8 @@ export default function CoursePlayer() {
         </div>
       </section>
 
+      {hasRealChallenge && (
       <section className="min-h-0">
-        {currentLesson.challenge ? (
           <InteractiveChallenge
             key={String(currentLessonId)}
             challenge={currentLesson.challenge}
@@ -123,10 +126,8 @@ export default function CoursePlayer() {
               setCompletedLessons(prev => prev.some(item => String(item) === String(currentLessonId)) ? prev : [...prev, currentLessonId]);
             }}
           />
-        ) : (
-          <div className="h-full rounded-2xl border border-slate-700 bg-[#161616] p-6 text-slate-400">Esta lección no tiene reto.</div>
-        )}
       </section>
+      )}
     </div>
   );
 }
