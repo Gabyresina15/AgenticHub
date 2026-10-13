@@ -21,10 +21,11 @@ export default function InteractiveChallenge({ challenge, lessonId, onSolve, fil
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      setStatus('error');
+      setStatus('success');
       setFeedback(res.status === 401
-        ? 'Pasaste los tests, pero tenés que iniciar sesión para guardar el progreso.'
+        ? 'Pasaste los tests. Iniciá sesión si querés que quede guardado.'
         : data.error || 'Pasaste los tests, pero no se pudo guardar.');
+      if (onSolve) onSolve();
       return;
     }
     setStatus('success');
