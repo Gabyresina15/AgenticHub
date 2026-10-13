@@ -14,9 +14,9 @@ const lessons = [
   {
     title: "Sumar dos numeros",
     order: 1,
-    contentMarkdown: "# Sumar dos numeros\n\nUna funcion pura recibe datos y devuelve un resultado. No imprime: retorna.",
-    teaches: "Una funcion recibe argumentos y devuelve un valor. El runner compara ese return, no lo que imprimis.",
-    howToSolve: "Dentro de sumar, devolvé a + b. No hace falta console.log.",
+    contentMarkdown: "Una funcion recibe datos y devuelve un resultado. No imprime: el runner mira el return.\n\nEjemplo, con otros numeros que los del reto: sumar(10, 4) tiene que devolver 14. Adentro de la funcion eso es return 10 + 4.",
+    teaches: "El nombre de la funcion es el contrato. Los argumentos entran, el return sale.",
+    howToSolve: "En el hueco de sumar escribi return a + b. No uses console.log: el test no lee la consola.",
     challenge: {
       title: "Sumar",
       description: "Devolve la suma de los dos numeros.",
@@ -34,9 +34,9 @@ const lessons = [
   {
     title: "Filtrar numeros pares",
     order: 2,
-    contentMarkdown: "# Pares\n\n`filter` arma un array nuevo con los elementos que pasan una condicion.",
-    teaches: "Un numero es par si el resto de dividirlo por 2 es 0. Podes recorrerlo con filter o con un bucle.",
-    howToSolve: "Devolvé un array nuevo, solo con los numeros donde n % 2 === 0. No modifiques el original.",
+    contentMarkdown: "Un numero es par si el resto de dividirlo por 2 es 0. 8 % 2 es 0, 7 % 2 es 1.\n\nEjemplo: de [5, 6, 7, 8] tienen que salir [6, 8]. Recorres la lista, y si el numero es par lo guardas en un array nuevo. El original no se toca.",
+    teaches: "Filter o un bucle hacen lo mismo: arman otra lista con los que pasan la condicion.",
+    howToSolve: "Crea un array vacio. Recorre numeros. Si n % 2 === 0, metelo en el nuevo. Al final, return de ese array.",
     challenge: {
       title: "Pares",
       description: "Devolve un array solo con los numeros pares.",
@@ -54,9 +54,9 @@ const lessons = [
   {
     title: "El mayor de una lista",
     order: 3,
-    contentMarkdown: "# Maximo\n\nRecorré la lista y conservá el mayor valor visto.",
-    teaches: "Para encontrar un maximo hay que mirar todos los elementos. Una lista vacia no tiene mayor.",
-    howToSolve: "Si numeros esta vacio, devolvé null. Si no, recorrelo y quedate con el mayor.",
+    contentMarkdown: "El mayor es el numero mas grande de la lista. No alcanza con mirar el primero: hay que compararlos todos.\n\nEjemplo, distinto al del reto: en [4, 1, 7] el mayor es 7. Arrancas guardando 4. Comparas con 1, sigue 4. Comparas con 7, ahora es 7. Si la lista esta vacia, no hay mayor: se devuelve null.",
+    teaches: "Un maximo se encuentra comparando cada elemento con el mayor visto hasta ahora.",
+    howToSolve: "Si numeros.length es 0, return null. Si no, guarda el primero y recorre el resto. Cuando encuentres uno mas grande, reemplazalo. Al terminar, return de ese valor.",
     challenge: {
       title: "Maximo",
       description: "Devolve el numero mas grande, o null si no hay elementos.",

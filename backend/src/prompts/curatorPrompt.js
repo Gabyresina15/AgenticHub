@@ -28,8 +28,8 @@ hasChallenge debe ser true. tests tiene que tener 2 o 3 casos. Cada test llama u
 {
   "title": "Titulo corto",
   "contentMarkdown": "Teoria corta, sin la solucion",
-  "teaches": "Que concepto tiene que entender el alumno",
-  "howToSolve": "Como encarar el hueco, sin pegar la funcion resuelta",
+  "teaches": "El concepto, en una o dos frases",
+  "howToSolve": "Como encararlo, con un ejemplo de numeros distintos a los tests. Sin pegar la funcion resuelta del reto.",
   "quizData": { "question": "...", "options": ["A", "B", "C", "D"], "correctAnswerIndex": 0 },
   "hasChallenge": true,
   "challenge": {
