@@ -57,6 +57,10 @@ export default function StudentDashboard() {
         }
     };
 
+    if (loading) {
+        return <div className="text-center mt-20 font-bold text-slate-300 text-xl">Cargando tu espacio de aprendizaje...</div>;
+    }
+
     if (!user) {
         return (
             <div className="max-w-md mx-auto mt-20 p-8 bg-[#242424] border border-slate-700/50 rounded-2xl text-center">
@@ -65,8 +69,6 @@ export default function StudentDashboard() {
                 <button onClick={() => navigate('/login')} className="mt-6 px-5 py-3 rounded-xl bg-indigo-600 text-white font-bold">Iniciar sesión</button>
             </div>
         );
-    }
-        return <div className="text-center mt-20 font-bold text-slate-300 text-xl">Cargando tu espacio de aprendizaje... 🚀</div>;
     }
 
     // Filtramos los cursos para la sección "Explorar": solo mostramos en los que NO está inscrito
