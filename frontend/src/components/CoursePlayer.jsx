@@ -89,9 +89,9 @@ export default function CoursePlayer() {
             {isCurrentCompleted ? 'Completada ✓' : 'En progreso'}
           </span>
         </div>
-        <div className={`flex-1 overflow-y-auto px-8 py-6 space-y-5 text-slate-300 ${hasRealChallenge ? '' : 'max-w-3xl'}`}>
+        <div className="flex-1 overflow-y-auto px-10 py-8 text-slate-300">
           <div className="prose prose-invert max-w-none leading-relaxed">
-            <ReactMarkdown>{currentLesson.contentMarkdown || currentLesson.content || 'Sin contenido.'}</ReactMarkdown>
+            <ReactMarkdown>{(currentLesson.contentMarkdown || currentLesson.content || 'Sin contenido.').replace(/^# .+\n+/, '')}</ReactMarkdown>
           </div>
           {currentLesson.teaches && (
             <div>
