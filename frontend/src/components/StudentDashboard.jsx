@@ -11,7 +11,7 @@ export default function StudentDashboard() {
     const fetchData = async () => {
         try {
             const [profileRes, coursesRes] = await Promise.all([
-                fetch('/api/users/profile'), // Llama a tu tremendo controlador con populate y cálculos
+                fetch('/api/users/profile', { credentials: 'include' }),
                 fetch('/api/courses')
             ]);
 
@@ -41,6 +41,7 @@ export default function StudentDashboard() {
             const res = await fetch('/api/users/enroll', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ courseId })
             });
 
@@ -56,7 +57,15 @@ export default function StudentDashboard() {
         }
     };
 
-    if (loading) {
+    if (!user) {
+        return (
+            <div className="max-w-md mx-auto mt-20 p-8 bg-[#242424] border border-slate-700/50 rounded-2xl text-center">
+                <h2 className="text-2xl font-black text-slate-100">Entrá para ver tu progreso</h2>
+                <p className="text-slate-400 mt-2">El dashboard es de tu cuenta. Los cursos se pueden ver sin sesión.</p>
+                <button onClick={() => navigate('/login')} className="mt-6 px-5 py-3 rounded-xl bg-indigo-600 text-white font-bold">Iniciar sesión</button>
+            </div>
+        );
+    }
         return <div className="text-center mt-20 font-bold text-slate-300 text-xl">Cargando tu espacio de aprendizaje... 🚀</div>;
     }
 
