@@ -19,6 +19,25 @@ export const getCourses = async (req, res) => {
   }
 };
 
+export const getPathById = async (req, res) => {
+  const path = await Path.findById(req.params.id).populate({ path: 'courses', populate: { path: 'lessons' } });
+  if (!path) return res.status(404).json({ error: 'Ruta no encontrada' });
+  res.status(200).json({ success: true, data: path });
+};
+
+export const createPath = async (req, res) => {
+  const { title, description, level, courses: courseIds } = req.body || {};
+  if (!title) return res.status(400).json({ error: 'El título es obligatorio.' });
+  const slug = title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const path = await Path.create({
+    slug,
+    title,
+    description: description || '',
+    level: level || 'Básico',
+    courses: courseIds || [],
+  });
+  res.status(201).json({ success: true, data: path });
+};
 export const getPaths = async (req, res) => {
   try {
     const paths = await Path.find().populate({ path: 'courses', populate: { path: 'lessons' } });

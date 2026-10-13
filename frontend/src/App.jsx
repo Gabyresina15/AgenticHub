@@ -7,6 +7,7 @@ import Login from './components/Login';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Profile from './components/Profile';
 import CoursePlayer from './components/CoursePlayer';
+import PathPage from './components/PathPage';
 import StudentDashboard from './components/StudentDashboard';
 import Navbar from './components/Navbar';
 import LandingPage from './components/LandingPage';
@@ -29,6 +30,7 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/course/:id" element={<CoursePlayer />} />
+              <Route path="/path/:id" element={<PathPage />} />
               <Route path="/dashboard" element={<StudentDashboard />} />
               <Route path="/courses" element={<CourseCatalog />} />
             </Routes>

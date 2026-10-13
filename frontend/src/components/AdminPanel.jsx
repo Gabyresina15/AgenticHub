@@ -16,7 +16,7 @@ export default function AdminPanel() {
   const [newLessonContent, setNewLessonContent] = useState('');
   const [newLessonVideoUrl, setNewLessonVideoUrl] = useState('');
   const [isCreatingLesson, setIsCreatingLesson] = useState(false);
-  const [postForm, setPostForm] = useState({ title: '', tag: 'Actualización', summary: '', body: '' });
+  const [pathForm, setPathForm] = useState({ title: '', description: '', level: 'Básico', courses: [] });
 
   // Estados para Modales (Confirmación y Edición)
   const [modalConfig, setModalConfig] = useState({
@@ -101,6 +101,17 @@ export default function AdminPanel() {
         }
       }
     });
+  };
+
+  const handleCreatePath = async (e) => {
+    e.preventDefault();
+    const res = await fetch('/api/courses/paths', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(pathForm),
+    });
+    if (res.ok) setPathForm({ title: '', description: '', level: 'Básico', courses: [] });
   };
 
   const handleCreatePost = async (e) => {
@@ -478,6 +489,39 @@ export default function AdminPanel() {
           <input value={postForm.tag} onChange={(e) => setPostForm({ ...postForm, tag: e.target.value })} placeholder="Etiqueta" className="w-full px-4 py-3 rounded-lg border border-slate-700 bg-[#1a1a1a] text-slate-200" />
           <textarea value={postForm.body} onChange={(e) => setPostForm({ ...postForm, body: e.target.value })} placeholder="Texto" className="w-full h-28 px-4 py-3 rounded-lg border border-slate-700 bg-[#1a1a1a] text-slate-200" required />
           <button className="bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-bold">Publicar novedad</button>
+        </form>
+      </div>
+
+      <div className="bg-[#242424] p-8 rounded-2xl border border-slate-700/50">
+        <h2 className="text-2xl font-black text-slate-100 mb-2">Nueva ruta</h2>
+        <p className="text-slate-400 mb-6">Una ruta es el orden de los cursos. El orden de los tildes es el orden de la ruta.</p>
+        <form onSubmit={handleCreatePath} className="space-y-3">
+          <input value={pathForm.title} onChange={(e) => setPathForm({ ...pathForm, title: e.target.value })} placeholder="Título de la ruta" className="w-full px-4 py-3 rounded-lg border border-slate-700 bg-[#1a1a1a] text-slate-200" required />
+          <input value={pathForm.description} onChange={(e) => setPathForm({ ...pathForm, description: e.target.value })} placeholder="Descripción" className="w-full px-4 py-3 rounded-lg border border-slate-700 bg-[#1a1a1a] text-slate-200" />
+          <select value={pathForm.level} onChange={(e) => setPathForm({ ...pathForm, level: e.target.value })} className="w-full px-4 py-3 rounded-lg border border-slate-700 bg-[#1a1a1a] text-slate-200">
+            <option>Básico</option>
+            <option>Intermedio</option>
+            <option>Avanzado</option>
+          </select>
+          <div className="space-y-2">
+            {courses.map((course) => {
+              const selected = pathForm.courses.includes(course._id);
+              return (
+                <label key={course._id} className="flex items-center gap-3 text-slate-300">
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={() => setPathForm({
+                      ...pathForm,
+                      courses: selected ? pathForm.courses.filter((id) => id !== course._id) : [...pathForm.courses, course._id],
+                    })}
+                  />
+                  {course.title}
+                </label>
+              );
+            })}
+          </div>
+          <button className="bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-bold">Crear ruta</button>
         </form>
       </div>
 

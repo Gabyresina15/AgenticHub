@@ -69,13 +69,15 @@ export default function CoursesView() {
         <h2 className="text-2xl font-black text-slate-100">Rutas</h2>
         {paths.map((path) => (
           <article key={path._id} className="bg-[#242424] rounded-2xl border border-slate-700/50 p-6">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <h3 className="text-xl font-bold text-slate-100">{path.title}</h3>
-                <p className="text-slate-400 text-sm mt-1">{path.description}</p>
+            <button onClick={() => navigate(`/path/${path._id}`)} className="text-left w-full">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-bold text-slate-100">{path.title}</h3>
+                  <p className="text-slate-400 text-sm mt-1">{path.description}</p>
+                </div>
+                <span className="text-xs uppercase tracking-wider text-indigo-300">{path.level}</span>
               </div>
-              <span className="text-xs uppercase tracking-wider text-indigo-300">{path.level}</span>
-            </div>
+            </button>
             <div className="mt-4 flex flex-wrap gap-3">
               {(path.courses || []).map((course, index) => (
                 <button key={course._id} onClick={() => navigate(`/course/${course._id}`)} className="px-4 py-2 rounded-xl bg-[#1a1a1a] border border-slate-800 text-slate-200 text-sm">
