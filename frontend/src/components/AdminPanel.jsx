@@ -17,6 +17,7 @@ export default function AdminPanel() {
   const [newLessonVideoUrl, setNewLessonVideoUrl] = useState('');
   const [isCreatingLesson, setIsCreatingLesson] = useState(false);
   const [pathForm, setPathForm] = useState({ title: '', description: '', level: 'Básico', courses: [] });
+  const [postForm, setPostForm] = useState({ title: '', tag: 'Actualización', summary: '', body: '' });
 
   // Estados para Modales (Confirmación y Edición)
   const [modalConfig, setModalConfig] = useState({
