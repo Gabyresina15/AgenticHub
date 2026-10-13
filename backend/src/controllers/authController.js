@@ -2,7 +2,10 @@ import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'mi_super_secreto_agentic_hub_2026';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('Falta JWT_SECRET en el entorno.');
+}
 
 function cookieOptions() {
   return {

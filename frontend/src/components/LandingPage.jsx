@@ -31,7 +31,7 @@ export default function LandingPage() {
           <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-emerald-400">resolviendo funciones.</span>
         </h1>
         <p className="mt-6 text-lg text-slate-400 max-w-2xl mx-auto">
-          Tres cursos, en orden. Cada lección explica con un ejemplo y te deja el código incompleto.
+          {(path?.courses?.length || 3)} tramos, en orden. Cada lección explica con un ejemplo y te deja el código incompleto.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
           <Link to={path ? `/path/${path._id}` : '/courses'} className="px-8 py-4 rounded-xl font-bold bg-indigo-600 text-white shadow-lg shadow-indigo-500/20">
