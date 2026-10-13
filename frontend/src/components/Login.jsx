@@ -102,7 +102,7 @@ export default function Login() {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-[#121212] text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
+                className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-[#121212] text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 autofill:bg-[#121212]"
                 placeholder="Nombre"
               />
             )}
