@@ -24,14 +24,14 @@ export default function LandingPage() {
   return (
     <div className="text-slate-200">
       <section className="max-w-5xl mx-auto px-4 pt-20 pb-16 text-center">
-        <p className="text-xs uppercase tracking-[0.25em] text-indigo-300">Ruta de lógica</p>
+        <p className="text-xs uppercase tracking-[0.25em] text-indigo-300">AgenticHub</p>
         <h1 className="mt-4 text-5xl md:text-7xl font-black tracking-tight text-slate-100 leading-tight">
-          Aprendé a programar
+          El agente arma
           <br />
-          <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-emerald-400">resolviendo funciones.</span>
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-emerald-400">la lección.</span>
         </h1>
         <p className="mt-6 text-lg text-slate-400 max-w-2xl mx-auto">
-          {(path?.courses?.length || 3)} tramos, en orden. Cada lección explica con un ejemplo y te deja el código incompleto.
+          Vos completás la función y la corrés. El progreso queda guardado.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
           <Link to={path ? `/path/${path._id}` : '/courses'} className="px-8 py-4 rounded-xl font-bold bg-indigo-600 text-white shadow-lg shadow-indigo-500/20">
