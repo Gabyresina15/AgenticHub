@@ -51,7 +51,11 @@ export default function CoursePlayer() {
         console.error('Error al completar lección', err);
       }
     }
-    if (currentLessonIndex < course.lessons.length - 1) setCurrentLessonIndex(prev => prev + 1);
+    if (currentLessonIndex < course.lessons.length - 1) {
+      setCurrentLessonIndex(prev => prev + 1);
+      return;
+    }
+    navigate('/courses');
   };
 
   return (
