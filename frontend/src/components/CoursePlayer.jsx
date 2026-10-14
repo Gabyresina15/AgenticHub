@@ -10,6 +10,7 @@ export default function CoursePlayer() {
   const [loading, setLoading] = useState(true);
   const [completedLessons, setCompletedLessons] = useState([]);
   const [challengeSolved, setChallengeSolved] = useState(false);
+  const [finished, setFinished] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -55,8 +56,24 @@ export default function CoursePlayer() {
       setCurrentLessonIndex(prev => prev + 1);
       return;
     }
-    navigate('/courses');
+    setFinished(true);
   };
+
+  if (finished) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center px-4">
+        <div className="max-w-lg text-center bg-[#242424] border border-slate-700/50 rounded-3xl p-10">
+          <p className="text-xs uppercase tracking-[0.25em] text-emerald-300">Curso terminado</p>
+          <h1 className="text-4xl font-black text-slate-100 mt-3">Completaste {course.title}.</h1>
+          <p className="text-slate-400 mt-3">{course.lessons.length} lecciones. El progreso quedó guardado.</p>
+          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3">
+            <Link to="/courses" className="px-6 py-3 rounded-xl font-bold bg-indigo-600 text-white">Volver a cursos</Link>
+            <Link to="/" className="px-6 py-3 rounded-xl font-bold bg-[#1a1a1a] text-slate-300 border border-slate-700">Ir al home</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`-mx-8 -mt-8 h-[calc(100vh-4.5rem)] p-4 grid grid-cols-1 gap-4 ${hasRealChallenge ? 'lg:grid-cols-[220px_minmax(0,1fr)_minmax(0,1.15fr)]' : 'lg:grid-cols-[220px_minmax(0,1fr)]'}`}>
