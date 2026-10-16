@@ -12,6 +12,8 @@ import StudentDashboard from './components/StudentDashboard';
 import Navbar from './components/Navbar';
 import LandingPage from './components/LandingPage';
 import CourseCatalog from './components/CourseCatalog';
+import NewsList from './components/news/NewsList';
+import NewsDetail from './components/news/NewsDetail';
 
 export default function App() {
   return (
@@ -33,6 +35,8 @@ export default function App() {
               <Route path="/path/:id" element={<PathPage />} />
               <Route path="/dashboard" element={<StudentDashboard />} />
               <Route path="/courses" element={<CourseCatalog />} />
+              <Route path="/news" element={<NewsList />} />
+              <Route path="/news/:slug" element={<NewsDetail />} />
             </Routes>
           </main>
         </div>

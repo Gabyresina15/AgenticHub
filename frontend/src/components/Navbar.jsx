@@ -19,6 +19,7 @@ export default function Navbar() {
       <div className="space-x-6 font-medium flex items-center">
         <Link to="/courses" className="text-slate-300 hover:text-indigo-400 font-bold transition-colors">📚 Cursos</Link>
         <Link to="/feed" className="text-slate-300 hover:text-indigo-400 font-bold transition-colors">Explorar 📰</Link>
+        <Link to="/news" className="text-slate-300 hover:text-indigo-400 font-bold transition-colors">🤖 Noticias IA</Link>
 
         {user ? (
           <div className="relative group cursor-pointer ml-4">
