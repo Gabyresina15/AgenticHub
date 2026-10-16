@@ -9,13 +9,13 @@ const steps = [
 ];
 
 export default function LandingPage() {
-  const [path, setPath] = useState(null);
+  const [paths, setPaths] = useState([]);
   const posts = getAllNews().slice(0, 3);
 
   useEffect(() => {
     fetch('/api/courses/paths').then((res) => res.json()).then((pathData) => {
-      setPath((pathData.data || [])[0] || null);
-    }).catch(() => setPath(null));
+      setPaths(pathData.data || []);
+    }).catch(() => setPaths([]));
   }, []);
 
   return (
@@ -50,8 +50,8 @@ export default function LandingPage() {
         ))}
       </section>
 
-      {path && (
-        <section className="max-w-5xl mx-auto px-4 pb-20">
+      {paths.map((path) => (
+        <section key={path._id} className="max-w-5xl mx-auto px-4 pb-10">
           <div className="bg-[#242424] border border-slate-700/50 rounded-3xl p-8 md:p-10">
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
               <div>
@@ -72,7 +72,7 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-      )}
+      ))}
 
       {posts.length > 0 && (
         <section className="max-w-5xl mx-auto px-4 pb-20">
