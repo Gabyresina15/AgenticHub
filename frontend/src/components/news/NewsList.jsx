@@ -8,7 +8,8 @@ export default function NewsList() {
 
   return (
     <section className="max-w-3xl mx-auto">
-      <h1 className="text-3xl font-black text-slate-100 mb-8">Noticias de IA</h1>
+      <h1 className="text-3xl font-black text-slate-100 mb-2">Explorar</h1>
+      <p className="text-slate-400 mb-8">Novedades de IA. No son lecciones.</p>
       {articles.length === 0 ? (
         <p className="text-slate-400">Todavía no hay noticias publicadas.</p>
       ) : (

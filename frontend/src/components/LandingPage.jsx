@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { getAllNews } from '../news/newsRepository';
 
 const steps = [
   { title: 'Leés el ejemplo', text: 'La lección muestra el caso resuelto con otros números. No es solo la consigna.' },
@@ -9,16 +10,12 @@ const steps = [
 
 export default function LandingPage() {
   const [path, setPath] = useState(null);
-  const [posts, setPosts] = useState([]);
+  const posts = getAllNews().slice(0, 3);
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/courses/paths').then((res) => res.json()).catch(() => ({ data: [] })),
-      fetch('/api/posts').then((res) => res.json()).catch(() => ({ data: [] })),
-    ]).then(([pathData, postData]) => {
+    fetch('/api/courses/paths').then((res) => res.json()).then((pathData) => {
       setPath((pathData.data || [])[0] || null);
-      setPosts((postData.data || []).slice(0, 3));
-    });
+    }).catch(() => setPath(null));
   }, []);
 
   return (
@@ -81,12 +78,12 @@ export default function LandingPage() {
         <section className="max-w-5xl mx-auto px-4 pb-20">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-black text-slate-100">Novedades</h2>
-            <Link to="/feed" className="text-sm text-indigo-300">Ver todas</Link>
+            <Link to="/news" className="text-sm text-indigo-300">Ver todas</Link>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
             {posts.map((post) => (
-              <Link key={post._id} to={`/feed/${post._id}`} className="bg-[#242424] border border-slate-700/50 rounded-2xl p-5 hover:border-slate-500">
-                <span className="text-xs uppercase tracking-wider text-emerald-300">{post.tag}</span>
+              <Link key={post.slug} to={`/news/${post.slug}`} className="bg-[#242424] border border-slate-700/50 rounded-2xl p-5 hover:border-slate-500">
+                <span className="text-xs uppercase tracking-wider text-emerald-300">{post.tags?.[0] || 'IA'}</span>
                 <h3 className="text-lg font-bold text-slate-100 mt-2">{post.title}</h3>
                 <p className="text-slate-400 text-sm mt-2 line-clamp-3">{post.summary}</p>
               </Link>

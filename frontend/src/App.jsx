@@ -24,8 +24,8 @@ export default function App() {
           <main className="max-w-7xl mx-auto p-8">
             <Routes>
               <Route path="/" element={<LandingPage />} />
-              <Route path="/feed" element={<Feed />} />
-              <Route path="/feed/:id" element={<Feed />} />
+              <Route path="/feed" element={<NewsList />} />
+              <Route path="/feed/:slug" element={<NewsDetail />} />
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/courses" element={<CoursesView />} />
               <Route path="/lesson/:id" element={<LessonDetail />} />
