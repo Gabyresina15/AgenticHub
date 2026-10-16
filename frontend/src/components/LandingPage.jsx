@@ -31,7 +31,7 @@ export default function LandingPage() {
           Vos completás la función y la corrés. El progreso queda guardado.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-          <Link to={path ? `/path/${path._id}` : '/courses'} className="px-8 py-4 rounded-xl font-bold bg-indigo-600 text-white shadow-lg shadow-indigo-500/20">
+          <Link to={paths[0] ? `/path/${paths[0]._id}` : '/courses'} className="px-8 py-4 rounded-xl font-bold bg-indigo-600 text-white shadow-lg shadow-indigo-500/20">
             Empezar la ruta
           </Link>
           <Link to="/courses" className="px-8 py-4 rounded-xl font-bold bg-[#242424] text-slate-300 border border-slate-700">
