@@ -1,6 +1,6 @@
-import 'dotenv/config';
-import mongoose from 'mongoose';
-import connectDB from './src/config/db.js';
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import { connectDB } from "./src/config/db.js";
 import Course from './src/models/Course.js';
 import Lesson from './src/models/Lesson.js';
 import Path from './src/models/Path.js';
@@ -249,6 +249,7 @@ async function replaceCourse(spec) {
 }
 
 async function seedPaths() {
+  dotenv.config();
   await connectDB();
   for (const pathSpec of paths) {
     const courses = [];
