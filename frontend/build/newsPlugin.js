@@ -33,14 +33,19 @@ export default function newsPlugin({ contentDir }) {
     },
     async load(id) {
       if (id !== RESOLVED_ID) return null;
-      this.addWatchFile(directory);
+      const entries = await readdir(directory, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.isFile() && entry.name.endsWith('.md')) {
+          this.addWatchFile(path.join(directory, entry.name));
+        }
+      }
       const articles = await loadNewsFromDirectory(directory);
       return `export default ${JSON.stringify(articles)};`;
     },
     configureServer(server) {
       server.watcher.add(directory);
       const reload = (file) => {
-        if (path.dirname(path.resolve(file)) !== directory) return;
+        if (path.resolve(path.dirname(file)) !== directory) return;
         const mod = server.moduleGraph.getModuleById(RESOLVED_ID);
         if (mod) server.moduleGraph.invalidateModule(mod);
         server.ws.send({ type: 'full-reload' });
