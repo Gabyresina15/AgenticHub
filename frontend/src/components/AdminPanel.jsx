@@ -6,6 +6,7 @@ export default function AdminPanel() {
   const [topic, setTopic] = useState('');
   const [isAgentWorking, setIsAgentWorking] = useState(false);
   const [agentError, setAgentError] = useState('');
+  const [plan, setPlan] = useState([]);
   const [courses, setCourses] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState('');
@@ -81,9 +82,17 @@ export default function AdminPanel() {
     }
   };
 
+  const loadPlan = () => {
+    fetch('/api/agent/plan', { credentials: 'include' })
+      .then((res) => res.json())
+      .then((data) => setPlan(data.data || []))
+      .catch(() => setPlan([]));
+  };
+
   useEffect(() => {
     fetchDrafts();
     fetchCoursesAndLessons();
+    loadPlan();
   }, []);
 
   const handlePublish = async (id) => {
@@ -151,18 +160,21 @@ export default function AdminPanel() {
     }
   };
 
-  const handleNextPlan = async () => {
+  const handleNextPlan = async (slug) => {
     setIsAgentWorking(true);
     setAgentError('');
     try {
       const res = await fetch('/api/agent/plan/next', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
+        body: JSON.stringify({ path: slug }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.data?.message || 'No se pudo generar');
       fetchCoursesAndLessons();
       fetchDrafts();
+      loadPlan();
     } catch (error) {
       setAgentError(error.message);
     } finally {
@@ -502,14 +514,26 @@ export default function AdminPanel() {
             {isAgentWorking ? 'Investigando...' : 'Generar Lección'}
           </button>
         </form>
-        <button
-          type="button"
-          onClick={handleNextPlan}
-          disabled={isAgentWorking}
-          className="mt-4 bg-[#1a1a1a] text-slate-200 border border-slate-700 px-6 py-3 rounded-lg font-bold hover:border-indigo-500 disabled:opacity-50"
-        >
-          {isAgentWorking ? 'Generando...' : 'Siguiente del plan'}
-        </button>
+        <div className="mt-6 space-y-3">
+          {plan.map((path) => (
+            <div key={path.slug} className="flex items-center justify-between gap-4 border border-slate-700 rounded-xl px-4 py-3">
+              <div>
+                <p className="font-bold text-slate-100">{path.title}</p>
+                <p className="text-sm text-slate-400">
+                  {path.next ? `Siguiente: ${path.next.course} · ${path.next.title}` : 'Completa'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleNextPlan(path.slug)}
+                disabled={isAgentWorking || !path.next}
+                className="shrink-0 bg-[#1a1a1a] text-slate-200 border border-slate-700 px-4 py-2 rounded-lg font-bold hover:border-indigo-500 disabled:opacity-40"
+              >
+                Generar
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="bg-[#242424] p-8 rounded-2xl border border-slate-700/50">

@@ -21,10 +21,34 @@ async function ensureCourse(pathSpec, courseSpec) {
   return course;
 }
 
+export const planStatus = async (req, res) => {
+  const startedAt = Date.now();
+  const paths = [];
+  for (const item of flattenPlan()) {
+    let group = paths.find((path) => path.slug === item.path.slug);
+    if (!group) {
+      group = { slug: item.path.slug, title: item.path.title, pending: [] };
+      paths.push(group);
+    }
+    const course = await Course.findOne({ title: item.course.title });
+    const existing = course ? await Lesson.findOne({ courseId: course._id, title: item.lesson.title }) : null;
+    if (!existing) group.pending.push({ course: item.course.title, title: item.lesson.title });
+  }
+  return sendContract(res, {
+    httpStatus: 200,
+    status: 'ok',
+    data: paths.map((path) => ({ ...path, next: path.pending[0] || null })),
+    agentUsed: null,
+    startedAt,
+  });
+};
+
 export const generateNext = async (req, res) => {
   const startedAt = Date.now();
   try {
+    const wanted = req.body?.path;
     for (const item of flattenPlan()) {
+      if (wanted && item.path.slug !== wanted) continue;
       const course = await ensureCourse(item.path, item.course);
       const existing = await Lesson.findOne({ courseId: course._id, title: item.lesson.title });
       if (existing) continue;
