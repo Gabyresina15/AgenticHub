@@ -5,6 +5,7 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [topic, setTopic] = useState('');
   const [isAgentWorking, setIsAgentWorking] = useState(false);
+  const [agentStatus, setAgentStatus] = useState('');
   const [agentError, setAgentError] = useState('');
   const [plan, setPlan] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -160,25 +161,34 @@ export default function AdminPanel() {
     }
   };
 
-  const handleNextPlan = async (slug) => {
+  const handleNextPlan = async (slug, all = false) => {
     setIsAgentWorking(true);
     setAgentError('');
+    setAgentStatus('');
     try {
-      const res = await fetch('/api/agent/plan/next', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ path: slug }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.data?.message || 'No se pudo generar');
-      fetchCoursesAndLessons();
+      let guard = 0;
+      do {
+        const res = await fetch('/api/agent/plan/next', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ path: slug }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.data?.message || 'No se pudo generar');
+        if (!data.data?.lesson) break;
+        guard += 1;
+        setAgentStatus(`${data.data.path}: ${data.data.lesson.title}`);
+        fetchCoursesAndLessons();
+        loadPlan();
+      } while (all && guard < 12);
       fetchDrafts();
       loadPlan();
     } catch (error) {
       setAgentError(error.message);
     } finally {
       setIsAgentWorking(false);
+      setAgentStatus('');
     }
   };
 
@@ -496,6 +506,7 @@ export default function AdminPanel() {
         <h2 className="text-2xl font-black text-indigo-400 mb-2">Comandar Agente 🤖</h2>
         <p className="text-slate-400 mb-6">Un tema suelto, o la siguiente lección del plan.</p>
         {agentError && <p className="text-rose-300 text-sm mb-4 break-all">{agentError}</p>}
+        {agentStatus && <p className="text-emerald-300 text-sm mb-4">Generada: {agentStatus}</p>}
 
         <form onSubmit={handleResearch} className="flex gap-4">
           <input
@@ -523,14 +534,24 @@ export default function AdminPanel() {
                   {path.next ? `Siguiente: ${path.next.course} · ${path.next.title}` : 'Completa'}
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => handleNextPlan(path.slug)}
-                disabled={isAgentWorking || !path.next}
-                className="shrink-0 bg-[#1a1a1a] text-slate-200 border border-slate-700 px-4 py-2 rounded-lg font-bold hover:border-indigo-500 disabled:opacity-40"
-              >
-                Generar
-              </button>
+              <div className="flex gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleNextPlan(path.slug)}
+                  disabled={isAgentWorking || !path.next}
+                  className="bg-[#1a1a1a] text-slate-200 border border-slate-700 px-4 py-2 rounded-lg font-bold hover:border-indigo-500 disabled:opacity-40"
+                >
+                  Una
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleNextPlan(path.slug, true)}
+                  disabled={isAgentWorking || !path.next}
+                  className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold disabled:opacity-40"
+                >
+                  Las que faltan
+                </button>
+              </div>
             </div>
           ))}
         </div>
