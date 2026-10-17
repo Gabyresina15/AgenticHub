@@ -97,6 +97,8 @@ export async function runCuratorAgent({ message, context = [] }) {
       topicId: topic?._id || null,
       title: parsed.title || message,
       contentMarkdown: markdown,
+      teaches: parsed.teaches || '',
+      howToSolve: parsed.howToSolve || '',
       lessonType: "reto_codigo",
       quizData: parsed.quizData || null,
       challenge: parsed.challenge || null,
