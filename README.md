@@ -70,7 +70,25 @@ Si `OLLAMA_ROUTER_URL` esta definido, el switch usa ese modelo local. Gemini que
 
 Las rutas de academia (`/api/courses`, `/api/auth`, `/api/lessons`) mantienen su contrato anterior para no romper el frontend React. El contrato estricto aplica a `/api/v1/orchestrate` y `/api/agent/research`.
 
-## Ejecutar codigo de verdad
+## Producción
+
+Un solo proceso. El backend sirve la API y el front compilado, mismo origen. Las cookies de login funcionan sin CORS.
+
+```bash
+cd frontend
+npm install
+cd ../backend
+npm install
+# .env con NODE_ENV=production, MONGO_URI, JWT_SECRET, GEMINI_API_KEY, GOOGLE_CLIENT_ID
+# el Client ID de Google también va en frontend/.env como VITE_GOOGLE_CLIENT_ID, antes del build
+NODE_ENV=production npm run start:prod
+```
+
+Eso compila el front y levanta Node en el puerto 3000. `/` es la app. `/api/health` responde `{"status":"ok"}`.
+
+Detrás de Nginx o Caddy, con HTTPS. La cookie es `secure` solo si `NODE_ENV=production`. El proceso confía en el proxy.
+
+El runner de código usa Node local si no hay Piston. En el servidor tiene que estar `node` en el PATH, o `PISTON_URL` apuntando a Piston.
 
 El reto ya no aprueba por contener un string. `POST /api/v1/execute` compila y corre tests.
 

@@ -20,6 +20,10 @@ console.log(`Modelo del agente: ${process.env.GEMINI_MODEL || "(no definido)"}`)
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isProd = process.env.NODE_ENV === "production";
+const frontendDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../frontend/dist");
+
+if (isProd) app.set("trust proxy", 1);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -30,6 +34,10 @@ app.use((req, res, next) => {
 
 connectDB();
 
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
 app.use("/api/v1", orchestratorRoutes);
 app.use("/api/agent", agentRoutes);
 app.use("/api/lessons", lessonRoutes);
@@ -39,6 +47,14 @@ app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use(errorHandler);
 
+if (isProd) {
+  app.use(express.static(frontendDist));
+  app.use((req, res, next) => {
+    if (req.method !== "GET" || req.path.startsWith("/api")) return next();
+    res.sendFile(path.join(frontendDist, "index.html"));
+  });
+}
+
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Servidor escuchando en el puerto ${PORT}`);
+  console.log(`Servidor escuchando en el puerto ${PORT}${isProd ? " (producción)" : ""}`);
 });

@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
+    "build:web": "npm --prefix ../frontend run build",
+    "start:prod": "npm run build:web && node src/server.js",
     "seed": "node seed.js",
     "seed:practice": "node seedPractice.js",
     "seed:paths": "node seedPaths.js"
