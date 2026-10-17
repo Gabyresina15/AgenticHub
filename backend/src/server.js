@@ -1,5 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import { connectDB } from "./config/db.js";
 import agentRoutes from "./routes/agentRoutes.js";
 import lessonRoutes from "./routes/lessonRoutes.js";
@@ -11,8 +13,10 @@ import userRoutes from "./routes/userRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import orchestratorRoutes from "./routes/orchestrator.js";
 
-dotenv.config();
-console.log(`Modelo del agente: ${process.env.GEMINI_MODEL || "(no definido, usa el default)"}`);
+const envPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../.env");
+dotenv.config({ path: envPath, override: true });
+console.log(`Env: ${envPath}`);
+console.log(`Modelo del agente: ${process.env.GEMINI_MODEL || "(no definido)"}`);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
