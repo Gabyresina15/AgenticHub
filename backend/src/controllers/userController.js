@@ -38,6 +38,31 @@ export const resetProgress = async (req, res) => {
   }
 };
 
+export const updateProfile = async (req, res) => {
+  try {
+    const name = String(req.body?.name || '').trim();
+    const password = req.body?.password;
+    if (!name) return res.status(400).json({ error: 'El nombre no puede estar vacío.' });
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado.' });
+
+    user.name = name;
+    if (password) {
+      if (String(password).length < 6) return res.status(400).json({ error: 'La contraseña tiene que tener al menos 6 caracteres.' });
+      user.password = password;
+    }
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role },
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'No se pudo guardar el perfil.' });
+  }
+};
+
 export const enrollInCourse = async (req, res) => {
   try {
     const userId = req.user.id; 

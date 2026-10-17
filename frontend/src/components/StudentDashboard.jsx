@@ -5,14 +5,16 @@ export default function StudentDashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [allCourses, setAllCourses] = useState([]);
+    const [paths, setPaths] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // Función para cargar el perfil (con el progreso) y todos los cursos
     const fetchData = async () => {
         try {
-            const [profileRes, coursesRes] = await Promise.all([
+            const [profileRes, coursesRes, pathsRes] = await Promise.all([
                 fetch('/api/users/profile', { credentials: 'include' }),
-                fetch('/api/courses')
+                fetch('/api/courses'),
+                fetch('/api/courses/paths')
             ]);
 
             if (profileRes.ok) {
@@ -23,6 +25,10 @@ export default function StudentDashboard() {
             if (coursesRes.ok) {
                 const coursesData = await coursesRes.json();
                 setAllCourses(coursesData.data || []);
+            }
+            if (pathsRes.ok) {
+                const pathsData = await pathsRes.json();
+                setPaths(pathsData.data || []);
             }
         } catch (error) {
             console.error("🔥 Error cargando dashboard:", error);
@@ -87,6 +93,28 @@ export default function StudentDashboard() {
                     Listo para seguir sumando conocimientos. Mirá tu progreso y descubrí nuevas rutas.
                 </p>
             </header>
+
+            <section className="space-y-6">
+                <h2 className="text-2xl font-black text-slate-100">Rutas</h2>
+                {paths.length === 0 ? (
+                    <p className="text-slate-500">Todavía no hay rutas publicadas.</p>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {paths.map((path) => (
+                            <button
+                                key={path._id}
+                                onClick={() => navigate(`/path/${path._id}`)}
+                                className="text-left bg-[#242424] border border-slate-700 rounded-2xl p-6 hover:border-indigo-500/40"
+                            >
+                                <p className="text-xs uppercase tracking-wider text-emerald-300">{path.level}</p>
+                                <h3 className="text-xl font-bold text-slate-100 mt-2">{path.title}</h3>
+                                <p className="text-slate-400 text-sm mt-2">{path.description}</p>
+                                <p className="text-slate-500 text-sm mt-4">{path.courses?.length || 0} cursos</p>
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </section>
 
             {/* MIS CURSOS (Progreso Real) */}
             <section className="space-y-6">
