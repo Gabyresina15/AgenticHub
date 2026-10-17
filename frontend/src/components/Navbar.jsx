@@ -33,6 +33,9 @@ export default function Navbar() {
                   Hola, {user.name}
                 </div>
                 
+                <Link to="/profile" className="px-4 py-3 text-sm text-slate-300 hover:bg-[#242424] hover:text-indigo-400 font-bold border-b border-slate-700/50">
+                  Editar perfil
+                </Link>
                 <Link to="/dashboard" className="px-4 py-3 text-sm text-slate-300 hover:bg-[#242424] hover:text-indigo-400 font-bold border-b border-slate-700/50">
                   📊 Mi Dashboard
                 </Link>
