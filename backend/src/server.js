@@ -12,6 +12,7 @@ import postRoutes from "./routes/postRoutes.js";
 import orchestratorRoutes from "./routes/orchestrator.js";
 
 dotenv.config();
+console.log(`Modelo del agente: ${process.env.GEMINI_MODEL || "(no definido, usa el default)"}`);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
