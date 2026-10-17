@@ -5,6 +5,7 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [topic, setTopic] = useState('');
   const [isAgentWorking, setIsAgentWorking] = useState(false);
+  const [agentError, setAgentError] = useState('');
   const [courses, setCourses] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState('');
@@ -131,19 +132,39 @@ export default function AdminPanel() {
     if (!topic.trim()) return;
 
     setIsAgentWorking(true);
+    setAgentError('');
     try {
       const res = await fetch('/api/agent/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ topic })
       });
-
-      if (res.ok) {
-        setTopic('');
-        fetchDrafts();
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.data?.message || 'No se pudo generar');
+      setTopic('');
+      fetchDrafts();
     } catch (error) {
-      console.error("Error al iniciar investigación:", error);
+      setAgentError(error.message);
+    } finally {
+      setIsAgentWorking(false);
+    }
+  };
+
+  const handleNextPlan = async () => {
+    setIsAgentWorking(true);
+    setAgentError('');
+    try {
+      const res = await fetch('/api/agent/plan/next', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.data?.message || 'No se pudo generar');
+      fetchCoursesAndLessons();
+      fetchDrafts();
+    } catch (error) {
+      setAgentError(error.message);
     } finally {
       setIsAgentWorking(false);
     }
@@ -461,7 +482,8 @@ export default function AdminPanel() {
       {/* Sección del Agente */}
       <div className="bg-[#242424] p-8 rounded-2xl border border-indigo-500/30">
         <h2 className="text-2xl font-black text-indigo-400 mb-2">Comandar Agente 🤖</h2>
-        <p className="text-slate-400 mb-6">Ingresá un tema y la IA investigará, redactará y creará un borrador automáticamente.</p>
+        <p className="text-slate-400 mb-6">Un tema suelto, o la siguiente lección del plan.</p>
+        {agentError && <p className="text-rose-300 text-sm mb-4 break-all">{agentError}</p>}
 
         <form onSubmit={handleResearch} className="flex gap-4">
           <input
@@ -480,6 +502,14 @@ export default function AdminPanel() {
             {isAgentWorking ? 'Investigando...' : 'Generar Lección'}
           </button>
         </form>
+        <button
+          type="button"
+          onClick={handleNextPlan}
+          disabled={isAgentWorking}
+          className="mt-4 bg-[#1a1a1a] text-slate-200 border border-slate-700 px-6 py-3 rounded-lg font-bold hover:border-indigo-500 disabled:opacity-50"
+        >
+          {isAgentWorking ? 'Generando...' : 'Siguiente del plan'}
+        </button>
       </div>
 
       <div className="bg-[#242424] p-8 rounded-2xl border border-slate-700/50">
