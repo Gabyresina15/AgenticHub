@@ -80,6 +80,13 @@ export default function StudentDashboard() {
     // Filtramos los cursos para la sección "Explorar": solo mostramos en los que NO está inscrito
     const enrolledCourseIds = user?.enrolledCourses?.map(c => c._id) || [];
     const exploreCourses = allCourses.filter(c => !enrolledCourseIds.includes(c._id));
+    const done = new Set((user.completedLessons || []).map((item) => String(item._id || item)));
+    const progressOf = (path) => {
+        const lessons = (path.courses || []).flatMap((course) => course.lessons || []);
+        const total = lessons.length;
+        const completed = lessons.filter((lesson) => done.has(String(lesson._id || lesson))).length;
+        return { total, completed, percent: total ? Math.round((completed / total) * 100) : 0 };
+    };
 
     return (
         <div className="max-w-6xl mx-auto py-8 px-4 space-y-12">
@@ -100,18 +107,27 @@ export default function StudentDashboard() {
                     <p className="text-slate-500">Todavía no hay rutas publicadas.</p>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {paths.map((path) => (
+                        {paths.map((path) => {
+                            const progress = progressOf(path);
+                            return (
                             <button
                                 key={path._id}
                                 onClick={() => navigate(`/path/${path._id}`)}
                                 className="text-left bg-[#242424] border border-slate-700 rounded-2xl p-6 hover:border-indigo-500/40"
                             >
-                                <p className="text-xs uppercase tracking-wider text-emerald-300">{path.level}</p>
+                                <div className="flex items-center justify-between gap-3">
+                                    <p className="text-xs uppercase tracking-wider text-emerald-300">{path.level}</p>
+                                    <span className="text-emerald-400 font-bold text-sm">{progress.percent}%</span>
+                                </div>
                                 <h3 className="text-xl font-bold text-slate-100 mt-2">{path.title}</h3>
                                 <p className="text-slate-400 text-sm mt-2">{path.description}</p>
-                                <p className="text-slate-500 text-sm mt-4">{path.courses?.length || 0} cursos</p>
+                                <div className="w-full bg-[#1a1a1a] rounded-full h-2 mt-4 border border-slate-700/50 overflow-hidden">
+                                    <div className="bg-emerald-500 h-2" style={{ width: `${progress.percent}%` }} />
+                                </div>
+                                <p className="text-slate-500 text-sm mt-3">{progress.completed} de {progress.total} lecciones · {path.courses?.length || 0} cursos</p>
                             </button>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </section>
