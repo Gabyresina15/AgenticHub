@@ -101,6 +101,3 @@ docker run -d --name agentichub-pg -e POSTGRES_PASSWORD=academy -e POSTGRES_DB=a
 En `.env`: `PISTON_URL=http://127.0.0.1:2000` y `PGVECTOR_URL=postgres://postgres:academy@127.0.0.1:5432/academy`.
 
 `python`, `javascript`, `go`, `rust`, `java`, `c` y `cpp` pasan por Piston. `pgvector` corre en el Postgres sandbox, dentro de una transaccion que siempre hace rollback. La API publica de Piston ya no es libre: el runner tiene que ser propio.
-
-
-Reemplazar esta URL cuando el pitch este publicado: `https://www.youtube.com/watch?v=VIDEO_PITCH`
